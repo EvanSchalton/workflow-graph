@@ -7,4 +7,7 @@ if TYPE_CHECKING:
 class Board(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
-    columns: List["StatusColumn"] = Relationship(back_populates="board")
+    columns: List["StatusColumn"] = Relationship(
+        back_populates="board",
+        sa_relationship_kwargs={"order_by": "StatusColumn.order"}
+    )

@@ -12,3 +12,4 @@ class StatusColumn(SQLModel, table=True):
     board_id: int = Field(foreign_key="board.id")
     board: Board = Relationship(back_populates="columns")
     tickets: List["Ticket"] = Relationship(back_populates="column")
+    order: int = Field(default=0)
