@@ -3,18 +3,22 @@ from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from app.jira.models import SQLModel
-from typing import AsyncGenerator
+from typing import AsyncGenerator, Literal
 from .models import Board, StatusColumn, Ticket, Webhook
 from typing import List
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, text
+import os
 
 DATABASE_URL = "postgresql+asyncpg://jira:jira@docker.lan:5432/postgres"
 
 # Define lifespan event handlers
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    print("lifespan Starting up...")
-    engine = create_async_engine(DATABASE_URL, echo=True)
+async def lifespan(
+    app: FastAPI,
+):
+    database_url = os.getenv("DATABASE_URL", DATABASE_URL)
+    schema = os.getenv("DATABASE_SCHEMA", "public")
+    engine = create_async_engine(database_url, echo=True)
 
     # Fix sessionmaker arguments
     async_session = sessionmaker( # type: ignore
@@ -23,8 +27,9 @@ async def lifespan(app: FastAPI):
         expire_on_commit=False
     )
 
-    # Create tables
+    # Create tables in the specified schema
     async with engine.begin() as conn:
+        await conn.execute(text(f"SET search_path TO {schema}"))
         await conn.run_sync(SQLModel.metadata.create_all)
 
     app.state.engine = engine
@@ -32,7 +37,6 @@ async def lifespan(app: FastAPI):
     try:
         yield
     finally:
-        print("lifespan Shutting down...")
         await engine.dispose()
 
 # Initialize FastAPI app with lifespan
@@ -40,7 +44,6 @@ app = FastAPI(lifespan=lifespan)
 
 # Dependency to get the database session
 async def get_session() -> AsyncGenerator[AsyncSession, None]:
-    print("get_session")  # Debugging print to trace calls
     if not hasattr(app.state, "async_session"):
         raise RuntimeError("Application is not fully initialized. Ensure the lifespan handler has run.")
 
