@@ -2,11 +2,11 @@ from fastapi import FastAPI, Depends, HTTPException
 from contextlib import asynccontextmanager
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
-from app.jira.models import SQLModel
-from typing import AsyncGenerator, Literal
+from typing import AsyncGenerator
 from .models import Board, StatusColumn, Ticket, Webhook
 from typing import List
 from sqlalchemy.sql import select, text
+from sqlmodel import SQLModel
 import os
 
 DATABASE_URL = "postgresql+asyncpg://jira:jira@docker.lan:5432/postgres"
@@ -117,7 +117,7 @@ async def update_column(column_id: int, column: StatusColumn, session: AsyncSess
     existing_column = await session.get(StatusColumn, column_id)
     if not existing_column:
         raise HTTPException(status_code=404, detail="Column not found")
-    for key, value in column.dict(exclude_unset=True).items():
+    for key, value in column.model_dump(exclude_unset=True).items():
         setattr(existing_column, key, value)
     session.add(existing_column)
     await session.commit()
@@ -158,7 +158,7 @@ async def update_ticket(ticket_id: int, ticket: Ticket, session: AsyncSession = 
     existing_ticket = await session.get(Ticket, ticket_id)
     if not existing_ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
-    for key, value in ticket.dict(exclude_unset=True).items():
+    for key, value in ticket.model_dump(exclude_unset=True).items():
         setattr(existing_ticket, key, value)
     session.add(existing_ticket)
     await session.commit()
@@ -199,7 +199,7 @@ async def update_webhook(webhook_id: int, webhook: Webhook, session: AsyncSessio
     existing_webhook = await session.get(Webhook, webhook_id)
     if not existing_webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")
-    for key, value in webhook.dict(exclude_unset=True).items():
+    for key, value in webhook.model_dump(exclude_unset=True).items():
         setattr(existing_webhook, key, value)
     session.add(existing_webhook)
     await session.commit()
