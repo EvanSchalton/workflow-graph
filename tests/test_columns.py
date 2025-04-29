@@ -7,15 +7,15 @@ def test_create_column(client, test_uuid):
     board_id = board_response.json()["id"]
 
     # Create a column linked to the board
-    response = client.post("/columns/", json={"name": "Test Column", "board_id": board_id})
+    response = client.post("/columns/", json={"name": f"Column-{test_uuid}", "board_id": board_id})
     assert response.status_code == 200
-    assert response.json()["name"] == "Test Column"
+    assert response.json()["name"] == f"Column-{test_uuid}"
 
 def test_read_columns(client, test_uuid):
     """Test reading all columns."""
     board_response = client.post("/boards/", json={"name": f"Test Board {test_uuid}"})
     board_id = board_response.json()["id"]
-    client.post("/columns/", json={"name": "Test Column", "board_id": board_id})
+    client.post("/columns/", json={"name": f"Column-{test_uuid}", "board_id": board_id})
 
     response = client.get("/columns/")
     assert response.status_code == 200
@@ -24,7 +24,7 @@ def test_read_column(client, test_uuid):
     """Test reading a specific column by ID."""
     board_response = client.post("/boards/", json={"name": f"Test Board {test_uuid}"})
     board_id = board_response.json()["id"]
-    column_response = client.post("/columns/", json={"name": "Test Column", "board_id": board_id})
+    column_response = client.post("/columns/", json={"name": f"Column-{test_uuid}", "board_id": board_id})
     column_id = column_response.json()["id"]
 
     response = client.get(f"/columns/{column_id}")
@@ -38,13 +38,13 @@ def test_update_column(client, test_uuid):
     board_id = board_response.json()["id"]
 
     # Create a column linked to the board
-    column_response = client.post("/columns/", json={"name": "Test Column", "board_id": board_id})
+    column_response = client.post("/columns/", json={"name": f"Column-{test_uuid}", "board_id": board_id})
     column_id = column_response.json()["id"]
 
     # Update the column
-    update_response = client.put(f"/columns/{column_id}", json={"name": "Updated Column"})
+    update_response = client.put(f"/columns/{column_id}", json={"name": f"Updated Column-{test_uuid}"})
     assert update_response.status_code == 200
-    assert update_response.json()["name"] == "Updated Column"
+    assert update_response.json()["name"] == f"Updated Column-{test_uuid}"
 
 def test_delete_column(client, test_uuid):
     """Test deleting a column with a valid board."""
@@ -53,7 +53,7 @@ def test_delete_column(client, test_uuid):
     board_id = board_response.json()["id"]
 
     # Create a column linked to the board
-    column_response = client.post("/columns/", json={"name": "Test Column", "board_id": board_id})
+    column_response = client.post("/columns/", json={"name": f"Column-{test_uuid}", "board_id": board_id})
     column_id = column_response.json()["id"]
 
     # Delete the column
