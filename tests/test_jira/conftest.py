@@ -12,7 +12,7 @@ from sqlmodel import SQLModel
 from unittest.mock import patch
 import os
 
-sys.path.append(str(Path(__file__).resolve().parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 from app.jira.main import app, DATABASE_URL
 
 @pytest.fixture
