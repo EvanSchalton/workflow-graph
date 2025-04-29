@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from typing import List
-from ..models.webhook import Webhook
+from ..models.webhook import Webhook, WebhookUpdate
 from ..routes.get_session import get_session
 
 router = APIRouter()
@@ -27,7 +27,7 @@ async def read_webhook(webhook_id: int, session: AsyncSession = Depends(get_sess
     return webhook
 
 @router.put("/{webhook_id}", response_model=Webhook)
-async def update_webhook(webhook_id: int, webhook: Webhook, session: AsyncSession = Depends(get_session)):
+async def update_webhook(webhook_id: int, webhook: WebhookUpdate, session: AsyncSession = Depends(get_session)):
     existing_webhook = await session.get(Webhook, webhook_id)
     if not existing_webhook:
         raise HTTPException(status_code=404, detail="Webhook not found")

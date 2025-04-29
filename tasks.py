@@ -6,16 +6,22 @@ def run(c: Context, port=8080):
     c.run(f"uvicorn app.jira.main:app --reload --port {port}", pty=True)
 
 @task
-def test(c: Context, verbose: bool = False):
+def test(c: Context, verbose: bool = False, log: bool = False):
     """Run the test suite using pytest."""
     command = "pytest"
 
     if verbose:
         command += " -vv"
 
+    if log:
+        command += " > test.log"
+
     c.run(command, pty=True)
 
 @task
-def check(c: Context):
+def check(c: Context, log: bool = False):
     """Run mypy to check for type errors."""
-    c.run("poetry run mypy . --explicit-package-bases")
+    command = "poetry run mypy . --explicit-package-bases"
+    if log:
+        command += " > mypy.log"
+    c.run(command)

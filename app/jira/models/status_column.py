@@ -1,6 +1,9 @@
+from typing import List, Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
-from typing import List, Optional
 from .board import Board
+
+if TYPE_CHECKING:
+    from .ticket import Ticket
 
 class StatusColumn(SQLModel, table=True):
     __tablename__ = "status_column"

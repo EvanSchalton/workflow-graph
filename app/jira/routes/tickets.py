@@ -4,12 +4,15 @@ from sqlalchemy.sql import select
 from typing import List
 from ..models.ticket import Ticket
 from ..routes.get_session import get_session
+from ..webhook_broadcaster import WebhookBroadcaster
+from ..models.webhook import WebhookEventCode, TicketEvent
 
 router = APIRouter()
 
 @router.post("/", response_model=Ticket)
 async def create_ticket(ticket: Ticket, session: AsyncSession = Depends(get_session)):
     session.add(ticket)
+    await WebhookBroadcaster(session).broadcast(event=TicketEvent(WebhookEventCode.TICKET_CREATE, ticket))
     await session.commit()
     await session.refresh(ticket)
     return ticket
@@ -34,6 +37,7 @@ async def update_ticket(ticket_id: int, ticket: Ticket, session: AsyncSession = 
     for key, value in ticket.model_dump(exclude_unset=True).items():
         setattr(existing_ticket, key, value)
     session.add(existing_ticket)
+    await WebhookBroadcaster(session).broadcast(event=TicketEvent(event_code=WebhookEventCode.TICKET_EDIT, payload=ticket))
     await session.commit()
     await session.refresh(existing_ticket)
     return existing_ticket
@@ -43,6 +47,7 @@ async def delete_ticket(ticket_id: int, session: AsyncSession = Depends(get_sess
     ticket = await session.get(Ticket, ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
+    await WebhookBroadcaster(session).broadcast(event=TicketEvent(event_code=WebhookEventCode.TICKET_DELETE, payload=ticket))
     await session.delete(ticket)
     await session.commit()
     return {"message": "Ticket deleted successfully"}
