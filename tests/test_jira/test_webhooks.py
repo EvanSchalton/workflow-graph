@@ -1,32 +1,32 @@
 import pytest
 from random import choice
-from app.jira.models.webhook.webhook_event_code import WebhookEventCode
+from api.jira.models import EventCode
 from fastapi.testclient import TestClient
 
 @pytest.fixture
-def event_code() -> WebhookEventCode:
-    return choice(list(WebhookEventCode))
+def event_code() -> EventCode:
+    return choice(list(EventCode))
 
 @pytest.fixture
 def url(test_uuid: str) -> str:
     """Generate a random URL for the webhook."""
     return f"http://example.com/webhook/{test_uuid}"
 
-def test_create_webhook(client: TestClient, url: str, event_code:WebhookEventCode):
+def test_create_webhook(client: TestClient, url: str, event_code:EventCode):
     """Test creating a webhook."""
     response = client.post("/api/webhooks/", json={"url": url, "event_code": event_code.value})
     assert response.status_code == 200
     assert response.json()["url"] == url
     assert response.json()["event_code"] == event_code.value
 
-def test_read_webhooks(client: TestClient, url: str, event_code:WebhookEventCode):
+def test_read_webhooks(client: TestClient, url: str, event_code:EventCode):
     """Test reading all webhooks."""
     client.post("/api/webhooks/", json={"url": url, "event_code": event_code.value})
 
     response = client.get("/api/webhooks/")
     assert response.status_code == 200
 
-def test_read_webhook(client: TestClient, url: str, event_code:WebhookEventCode):
+def test_read_webhook(client: TestClient, url: str, event_code:EventCode):
     """Test reading a specific webhook by ID."""
     webhook_response = client.post("/api/webhooks/", json={"url": url, "event_code": event_code.value})
     webhook_id = webhook_response.json()["id"]
@@ -36,7 +36,7 @@ def test_read_webhook(client: TestClient, url: str, event_code:WebhookEventCode)
     assert response.json()["id"] == webhook_id
     assert response.json()["event_code"] == event_code.value
 
-def test_update_webhook(client: TestClient, url: str, event_code:WebhookEventCode):
+def test_update_webhook(client: TestClient, url: str, event_code:EventCode):
     """Test updating a webhook."""
     update_url = f"{url}/updated"
     webhook_response = client.post("/api/webhooks/", json={"url": url, "event_code": event_code.value})
@@ -47,7 +47,7 @@ def test_update_webhook(client: TestClient, url: str, event_code:WebhookEventCod
     assert update_response.json()["url"] == update_url
     assert update_response.json()["event_code"] == event_code.value
 
-def test_delete_webhook(client: TestClient, url: str, event_code:WebhookEventCode):
+def test_delete_webhook(client: TestClient, url: str, event_code:EventCode):
     """Test deleting a webhook."""
     webhook_response = client.post("/api/webhooks/", json={"url": url, "event_code": event_code.value})
     webhook_id = webhook_response.json()["id"]

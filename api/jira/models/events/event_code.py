@@ -1,6 +1,6 @@
 from enum import Enum
 
-class WebhookEventCode(Enum):
+class EventCode(Enum):
     BOARD_CREATE = "BOARD_CREATE"
     BOARD_DELETE = "BOARD_DELETE"
     COLUMN_CREATE = "COLUMN_CREATE"

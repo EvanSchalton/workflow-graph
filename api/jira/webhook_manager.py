@@ -2,14 +2,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from sqlalchemy.sql.expression import cast
 from sqlalchemy.types import Boolean
-from .models import Webhook, WebhookEventCode
+from .models import Webhook, EventCode
 import asyncio
 
-class WebhookBroadcaster:
+class WebhookManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_subscribers(self, event_code: WebhookEventCode):
+    async def get_subscribers(self, event_code: EventCode):
         result = await self.session.execute(
             select(Webhook).where(cast(Webhook.event_code == event_code, Boolean))
         )

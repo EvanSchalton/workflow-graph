@@ -13,7 +13,8 @@ from unittest.mock import patch
 import os
 
 sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
-from app.jira.main import app, DATABASE_URL
+from api.jira.main import app, DATABASE_URL
+from api.jira.websocket.manager import WebsocketManager
 
 @pytest.fixture
 def test_uuid():
@@ -24,15 +25,17 @@ def test_uuid():
 def client() -> Generator[TestClient, None, None]:
     """Provide a TestClient for testing, ensuring the app's lifespan is started and tied to the test_db."""
     os.environ["DATABASE_SCHEMA"] = "test"
+    app.state.websocket_manager = WebsocketManager()
 
     with TestClient(app) as c:
+        yield c
         # Manually start the app's lifespan
-        asyncio.run(app.router.startup())
-        try:
-            yield c
-        finally:
-            # Manually stop the app's lifespan
-            asyncio.run(app.router.shutdown())
+        # asyncio.run(app.router.startup())
+        # try:
+        #     yield c
+        # finally:
+        #     # Manually stop the app's lifespan
+        #     asyncio.run(app.router.shutdown())
 
 @pytest_asyncio.fixture(scope="function")
 async def test_db() -> AsyncGenerator[AsyncSession, None]:
@@ -43,13 +46,13 @@ async def test_db() -> AsyncGenerator[AsyncSession, None]:
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 
-    async_session = sessionmaker( # type: ignore
+    session = sessionmaker( # type: ignore
         bind=engine,
         class_=AsyncSession,
         expire_on_commit=False
     )
 
-    yield async_session()
+    yield session()
 
     # Drop the test schema after the test
     async with engine.begin() as conn:

@@ -3,12 +3,15 @@ from invoke import task, Context
 @task
 def run(c: Context, port=8080):
     """Run the FastAPI server on a specified port (default: 8080)."""
-    c.run(f"uvicorn app.jira.main:app --reload --port {port}", pty=True)
+    c.run(f"uvicorn api.jira.main:app --reload --port {port}", pty=True)
 
 @task
-def test(c: Context, verbose: bool = False, log: bool = False):
+def test(c: Context, verbose: bool = False, log: bool = False, keyword: str | None = None):
     """Run the test suite using pytest."""
     command = "pytest"
+    
+    if keyword:
+        command += f" -k {keyword}"
 
     if verbose:
         command += " -vv"
