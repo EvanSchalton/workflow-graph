@@ -36,6 +36,7 @@ async def lifespan(
         await conn.run_sync(SQLModel.metadata.create_all)
 
     app.state.engine = engine
+    app.state.session_maker = session_maker
     app.state.session = session
     app.state.webhook_manager = WebhookManager(session=session)
     print("Creating WebsocketManager...")

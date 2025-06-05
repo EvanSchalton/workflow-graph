@@ -1,15 +1,14 @@
 from fastapi.websockets import WebSocket
 from ..models.events.base_event import BaseEvent
 from ..models import BoardEvent, TicketEvent, Board, Ticket
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class WebsocketConnection(BaseModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     websocket: WebSocket
     board_id: int | None = None
     ticket_id: int | None = None
-
-    class Config:
-        arbitrary_types_allowed = True
 
     def matches(self, event: BaseEvent) -> bool:
         if self.board_id is None and self.ticket_id is None:

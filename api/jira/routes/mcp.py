@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, APIRouter
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from typing import List
 from .dependencies import get_session
@@ -10,19 +10,19 @@ from ..models.status_column import StatusColumn
 router = APIRouter()
 
 @router.get("/resources/boards", response_model=List[Board])
-async def get_boards(session: Session = Depends(get_session)):
+async def get_boards(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Board))
     return result.scalars().all()
 
 @router.get("/resources/boards/{board_id}", response_model=Board)
-async def get_board_by_id(board_id: int, session: Session = Depends(get_session)):
+async def get_board_by_id(board_id: int, session: AsyncSession = Depends(get_session)):
     board = await session.get(Board, board_id)
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
     return board
 
 @router.put("/resources/boards/{board_id}", response_model=Board)
-async def update_board(board_id: int, board: Board, session: Session = Depends(get_session)):
+async def update_board(board_id: int, board: Board, session: AsyncSession = Depends(get_session)):
     existing_board = await session.get(Board, board_id)
     if not existing_board:
         raise HTTPException(status_code=404, detail="Board not found")
@@ -34,7 +34,7 @@ async def update_board(board_id: int, board: Board, session: Session = Depends(g
     return existing_board
 
 @router.delete("/resources/boards/{board_id}", response_model=dict)
-async def delete_board(board_id: int, session: Session = Depends(get_session)):
+async def delete_board(board_id: int, session: AsyncSession = Depends(get_session)):
     board = await session.get(Board, board_id)
     if not board:
         raise HTTPException(status_code=404, detail="Board not found")
@@ -43,19 +43,19 @@ async def delete_board(board_id: int, session: Session = Depends(get_session)):
     return {"message": "Board deleted successfully"}
 
 @router.get("/resources/tickets", response_model=List[Ticket])
-async def get_tickets(session: Session = Depends(get_session)):
+async def get_tickets(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Ticket))
     return result.scalars().all()
 
 @router.get("/resources/tickets/{ticket_id}", response_model=Ticket)
-async def get_ticket_by_id(ticket_id: int, session: Session = Depends(get_session)):
+async def get_ticket_by_id(ticket_id: int, session: AsyncSession = Depends(get_session)):
     ticket = await session.get(Ticket, ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
     return ticket
 
 @router.put("/resources/tickets/{ticket_id}", response_model=Ticket)
-async def update_ticket(ticket_id: int, ticket: Ticket, session: Session = Depends(get_session)):
+async def update_ticket(ticket_id: int, ticket: Ticket, session: AsyncSession = Depends(get_session)):
     existing_ticket = await session.get(Ticket, ticket_id)
     if not existing_ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
@@ -67,7 +67,7 @@ async def update_ticket(ticket_id: int, ticket: Ticket, session: Session = Depen
     return existing_ticket
 
 @router.delete("/resources/tickets/{ticket_id}", response_model=dict)
-async def delete_ticket(ticket_id: int, session: Session = Depends(get_session)):
+async def delete_ticket(ticket_id: int, session: AsyncSession = Depends(get_session)):
     ticket = await session.get(Ticket, ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
@@ -76,19 +76,19 @@ async def delete_ticket(ticket_id: int, session: Session = Depends(get_session))
     return {"message": "Ticket deleted successfully"}
 
 @router.get("/resources/columns", response_model=List[StatusColumn])
-async def get_columns(session: Session = Depends(get_session)):
+async def get_columns(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(StatusColumn))
     return result.scalars().all()
 
 @router.get("/resources/columns/{column_id}", response_model=StatusColumn)
-async def get_column_by_id(column_id: int, session: Session = Depends(get_session)):
+async def get_column_by_id(column_id: int, session: AsyncSession = Depends(get_session)):
     column = await session.get(StatusColumn, column_id)
     if not column:
         raise HTTPException(status_code=404, detail="Column not found")
     return column
 
 @router.put("/resources/columns/{column_id}", response_model=StatusColumn)
-async def update_column(column_id: int, column: StatusColumn, session: Session = Depends(get_session)):
+async def update_column(column_id: int, column: StatusColumn, session: AsyncSession = Depends(get_session)):
     existing_column = await session.get(StatusColumn, column_id)
     if not existing_column:
         raise HTTPException(status_code=404, detail="Column not found")
@@ -100,7 +100,7 @@ async def update_column(column_id: int, column: StatusColumn, session: Session =
     return existing_column
 
 @router.delete("/resources/columns/{column_id}", response_model=dict)
-async def delete_column(column_id: int, session: Session = Depends(get_session)):
+async def delete_column(column_id: int, session: AsyncSession = Depends(get_session)):
     column = await session.get(StatusColumn, column_id)
     if not column:
         raise HTTPException(status_code=404, detail="Column not found")

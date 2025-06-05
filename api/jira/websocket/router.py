@@ -24,7 +24,12 @@ async def websocket_endpoint(
         "ticket_id": ticket_id,
     })
 
+    connection: WebsocketConnection | None = None
     try:
+        # Accept the websocket connection first
+        await websocket.accept()
+        print("WebSocket accepted.")
+        
         connection = WebsocketConnection(
             websocket=websocket,
             board_id=board_id,
@@ -39,7 +44,10 @@ async def websocket_endpoint(
             await websocket_manager.broadcast(data)
     except WebSocketDisconnect:
         print("WebSocket disconnected.")
-        await websocket_manager.disconnect(connection)
+        if connection:
+            await websocket_manager.disconnect(connection)
     except Exception as e:
         print(f"Unhandled exception in WebSocket route: {e}")
+        if connection:
+            await websocket_manager.disconnect(connection)
         raise

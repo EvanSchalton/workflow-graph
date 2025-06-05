@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select
 from typing import List
 from ..models import StatusColumn, EventCode, StatusColumnEvent
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/", response_model=StatusColumn)
 async def create_column(
     column: StatusColumn,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):
@@ -28,12 +28,12 @@ async def create_column(
     return column
 
 @router.get("/", response_model=List[StatusColumn])
-async def read_columns(session: Session = Depends(get_session)):
+async def read_columns(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(StatusColumn))
     return result.scalars().all()
 
 @router.get("/{column_id}", response_model=StatusColumn)
-async def read_column(column_id: int, session: Session = Depends(get_session)):
+async def read_column(column_id: int, session: AsyncSession = Depends(get_session)):
     column = await session.get(StatusColumn, column_id)
     if column is None:
         raise HTTPException(status_code=404, detail="Column not found")
@@ -43,7 +43,7 @@ async def read_column(column_id: int, session: Session = Depends(get_session)):
 async def update_column(
     column_id: int,
     column: StatusColumn,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):
@@ -63,7 +63,7 @@ async def update_column(
 @router.delete("/{column_id}", response_model=dict)
 async def delete_column(
     column_id: int,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):

@@ -22,11 +22,13 @@ class WebsocketManager:
 
     async def broadcast(self, event: BaseEvent | str) -> None:
         if isinstance(event, BaseEvent):
-            message = event.model_dump()
+            message = event.model_dump(mode="json")
         else:
             message = {"message": event}
         for connection in self.active_connections.values():
-            if connection.matches(event) or isinstance(event, str):
+            # For string events, broadcast to all connections; for BaseEvent, check matches
+            should_send = isinstance(event, str) or connection.matches(event)
+            if should_send:
                 try:
                     await connection.websocket.send_json(message)
                 except Exception as e:

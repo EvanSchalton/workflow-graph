@@ -19,7 +19,7 @@ class Webhook(SQLModel, table=True):
                     "webhook_id": self.id,
                     "event": {
                         "event_code": event.event_code.value,
-                        "payload": event.payload.model_dump(),
+                        "payload": event.payload.model_dump(mode="json"),
                     }
                 }
             )

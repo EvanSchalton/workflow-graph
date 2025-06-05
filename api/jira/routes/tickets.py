@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.sql import select
 from typing import List
 from ..models import Ticket, EventCode, TicketEvent
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from .dependencies import get_session, get_webhook_manager, get_websocket_manager
 from ..webhook_manager import WebhookManager
 from ..websocket import WebsocketManager
@@ -12,7 +12,7 @@ router = APIRouter()
 @router.post("/", response_model=Ticket)
 async def create_ticket(
     ticket: Ticket,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):
@@ -25,12 +25,12 @@ async def create_ticket(
     return ticket
 
 @router.get("/", response_model=List[Ticket])
-async def read_tickets(session: Session = Depends(get_session)):
+async def read_tickets(session: AsyncSession = Depends(get_session)):
     result = await session.execute(select(Ticket))
     return result.scalars().all()
 
 @router.get("/{ticket_id}", response_model=Ticket)
-async def read_ticket(ticket_id: int, session: Session = Depends(get_session)):
+async def read_ticket(ticket_id: int, session: AsyncSession = Depends(get_session)):
     ticket = await session.get(Ticket, ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found")
@@ -40,7 +40,7 @@ async def read_ticket(ticket_id: int, session: Session = Depends(get_session)):
 async def update_ticket(
     ticket_id: int,
     ticket: Ticket,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):
@@ -60,7 +60,7 @@ async def update_ticket(
 @router.delete("/{ticket_id}", response_model=dict)
 async def delete_ticket(
     ticket_id: int,
-    session: Session = Depends(get_session),
+    session: AsyncSession = Depends(get_session),
     webhook_manager: WebhookManager = Depends(get_webhook_manager),
     websocket_manager: WebsocketManager = Depends(get_websocket_manager),
 ):
