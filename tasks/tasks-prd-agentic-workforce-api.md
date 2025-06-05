@@ -1,0 +1,145 @@
+## Relevant Files
+
+- `api/hr/__init__.py` - HR management service package initialization
+- `api/hr/models/job_description.py` - Job description data model with CRUD operations
+- `api/hr/models/job_description.test.py` - Unit tests for job description model
+- `api/hr/models/resume.py` - Resume data model with skills and experience tracking
+- `api/hr/models/resume.test.py` - Unit tests for resume model
+- `api/hr/models/job_application.py` - Job application model linking resumes to jobs
+- `api/hr/models/job_application.test.py` - Unit tests for job application model
+- `api/hr/models/agent.py` - Active agent roster model with configuration tracking
+- `api/hr/models/agent.test.py` - Unit tests for agent model
+- `api/hr/routes/job_descriptions.py` - REST API endpoints for job description CRUD
+- `api/hr/routes/job_descriptions.test.py` - API tests for job description endpoints
+- `api/hr/routes/resumes.py` - REST API endpoints for resume CRUD operations
+- `api/hr/routes/resumes.test.py` - API tests for resume endpoints
+- `api/hr/routes/applications.py` - REST API endpoints for job application management
+- `api/hr/routes/applications.test.py` - API tests for application endpoints
+- `api/hr/routes/agents.py` - REST API endpoints for agent roster management
+- `api/hr/routes/agents.test.py` - API tests for agent endpoints
+- `api/orchestration/__init__.py` - Task orchestration service package initialization
+- `api/orchestration/models/task.py` - Task model with dependency tracking and status management
+- `api/orchestration/models/task.test.py` - Unit tests for task model
+- `api/orchestration/models/task_assignment.py` - Task assignment model linking agents to tasks
+- `api/orchestration/models/task_assignment.test.py` - Unit tests for task assignment model
+- `api/orchestration/services/task_decomposer.py` - Service for breaking down JIRA tasks into sub-tasks
+- `api/orchestration/services/task_decomposer.test.py` - Unit tests for task decomposer
+- `api/orchestration/services/agent_matcher.py` - Service for matching agents to tasks based on skills and cost
+- `api/orchestration/services/agent_matcher.test.py` - Unit tests for agent matcher
+- `api/orchestration/routes/tasks.py` - REST API endpoints for task management
+- `api/orchestration/routes/tasks.test.py` - API tests for task endpoints
+- `api/orchestration/routes/assignments.py` - REST API endpoints for task assignment operations
+- `api/orchestration/routes/assignments.test.py` - API tests for assignment endpoints
+- `api/cost_tracking/__init__.py` - Cost tracking service package initialization
+- `api/cost_tracking/models/model_catalog.py` - Model catalog with costs and performance characteristics
+- `api/cost_tracking/models/model_catalog.test.py` - Unit tests for model catalog
+- `api/cost_tracking/models/execution_cost.py` - Model execution cost tracking per agent and task
+- `api/cost_tracking/models/execution_cost.test.py` - Unit tests for execution cost model
+- `api/cost_tracking/services/cost_calculator.py` - Service for calculating and aggregating costs
+- `api/cost_tracking/services/cost_calculator.test.py` - Unit tests for cost calculator
+- `api/cost_tracking/routes/models.py` - REST API endpoints for model catalog management
+- `api/cost_tracking/routes/models.test.py` - API tests for model endpoints
+- `api/cost_tracking/routes/costs.py` - REST API endpoints for cost tracking and reporting
+- `api/cost_tracking/routes/costs.test.py` - API tests for cost endpoints
+- `api/prompts/__init__.py` - Prompt management service package initialization
+- `api/prompts/models/task_prompt.py` - Task prompt model with template and variable support
+- `api/prompts/models/task_prompt.test.py` - Unit tests for task prompt model
+- `api/prompts/models/resume_prompt.py` - Resume prompt model for agent persona generation
+- `api/prompts/models/resume_prompt.test.py` - Unit tests for resume prompt model
+- `api/prompts/services/prompt_processor.py` - Service for processing prompts with variable substitution
+- `api/prompts/services/prompt_processor.test.py` - Unit tests for prompt processor
+- `api/prompts/routes/prompts.py` - REST API endpoints for prompt management
+- `api/prompts/routes/prompts.test.py` - API tests for prompt endpoints
+- `api/intelligence/__init__.py` - Agent intelligence service package initialization
+- `api/intelligence/services/consensus_engine.py` - Consensus algorithms for agent decision making
+- `api/intelligence/services/consensus_engine.test.py` - Unit tests for consensus engine
+- `api/intelligence/services/hiring_manager.py` - Hiring manager agent for evaluating candidates
+- `api/intelligence/services/hiring_manager.test.py` - Unit tests for hiring manager
+- `api/intelligence/services/recruiter.py` - Recruiter agent for generating synthetic resumes
+- `api/intelligence/services/recruiter.test.py` - Unit tests for recruiter
+- `api/intelligence/services/manager.py` - Manager agent for performance evaluation and quality assessment
+- `api/intelligence/services/manager.test.py` - Unit tests for manager agent
+- `api/intelligence/routes/hiring.py` - REST API endpoints for hiring process management
+- `api/intelligence/routes/hiring.test.py` - API tests for hiring endpoints
+- `api/shared/models/audit_log.py` - Audit log model for tracking all system activities
+- `api/shared/models/audit_log.test.py` - Unit tests for audit log model
+- `api/shared/services/auth.py` - Authentication and authorization service
+- `api/shared/services/auth.test.py` - Unit tests for auth service
+- `database/migrations/001_initial_schema.sql` - Initial database schema creation
+- `database/migrations/002_add_audit_tables.sql` - Audit table creation migration
+- `database/migrations/003_add_indexes.sql` - Performance index creation migration
+
+### Notes
+
+- Unit tests should typically be placed alongside the code files they are testing (e.g., `MyComponent.py` and `MyComponent.test.py` in the same directory).
+- Use `python -m pytest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the pytest configuration.
+- Follow the existing JIRA API structure as a template for service organization and patterns.
+- All services should implement proper dependency injection and follow SOLID principles.
+- Database models should use SQLAlchemy ORM with proper relationships and constraints.
+
+## Tasks
+
+- [ ] 1.0 Database Schema and Models Setup
+  - [ ] 1.1 Create database migration scripts for all core tables (job_descriptions, resumes, job_applications, agents, tasks, task_assignments, model_catalog, execution_costs, task_prompts, resume_prompts, audit_logs)
+  - [ ] 1.2 Implement SQLAlchemy models for HR management (JobDescription, Resume, JobApplication, Agent)
+  - [ ] 1.3 Implement SQLAlchemy models for task orchestration (Task, TaskAssignment)
+  - [ ] 1.4 Implement SQLAlchemy models for cost tracking (ModelCatalog, ExecutionCost)
+  - [ ] 1.5 Implement SQLAlchemy models for prompt management (TaskPrompt, ResumePrompt)
+  - [ ] 1.6 Implement shared models (AuditLog) with proper foreign key relationships
+  - [ ] 1.7 Create database indexes for performance optimization on frequently queried fields
+  - [ ] 1.8 Write comprehensive unit tests for all data models including edge cases and validation
+
+- [ ] 2.0 HR Management Service Implementation
+  - [ ] 2.1 Implement CRUD operations for job descriptions with validation and business logic
+  - [ ] 2.2 Implement CRUD operations for synthetic resumes with skills tracking and experience management
+  - [ ] 2.3 Implement job application management with status tracking (applied, interviewing, hired, rejected)
+  - [ ] 2.4 Implement active agent roster management with configuration and model assignment tracking
+  - [ ] 2.5 Create REST API endpoints for job description management with proper error handling
+  - [ ] 2.6 Create REST API endpoints for resume management with search and filtering capabilities
+  - [ ] 2.7 Create REST API endpoints for job application workflow management
+  - [ ] 2.8 Create REST API endpoints for agent roster operations with performance metrics
+  - [ ] 2.9 Implement comprehensive test coverage for all HR service endpoints and business logic
+
+- [ ] 3.0 Agent Orchestration and Task Management Service
+  - [ ] 3.1 Implement task model with dependency tracking, blocker management, and status workflows
+  - [ ] 3.2 Implement task assignment model linking agents to tasks with cost and capability scoring
+  - [ ] 3.3 Create task decomposer service for breaking down JIRA tasks into actionable sub-tasks
+  - [ ] 3.4 Create agent matcher service for evaluating existing agents and determining hiring needs
+  - [ ] 3.5 Implement task reassignment logic for handling failed assignments and agent performance issues
+  - [ ] 3.6 Create dependency blocking mechanisms to prevent execution of tasks with unresolved blockers
+  - [ ] 3.7 Implement REST API endpoints for task management with JIRA integration hooks
+  - [ ] 3.8 Implement REST API endpoints for task assignment operations with real-time status updates
+  - [ ] 3.9 Create comprehensive test coverage for orchestration logic including complex dependency scenarios
+
+- [ ] 4.0 Cost Tracking and Model Management Service
+  - [ ] 4.1 Implement model catalog with cost per execution, context limits, and performance characteristics
+  - [ ] 4.2 Implement execution cost tracking per agent, task, and time period with aggregation capabilities
+  - [ ] 4.3 Create cost calculator service for real-time cost computation and budget analysis
+  - [ ] 4.4 Implement configurable consensus mechanisms with different execution count strategies
+  - [ ] 4.5 Create cost attribution system linking model executions to specific tasks and agents
+  - [ ] 4.6 Implement REST API endpoints for model catalog management with cost updates
+  - [ ] 4.7 Create REST API endpoints for cost reporting and analysis with filtering and aggregation
+  - [ ] 4.8 Implement cost optimization algorithms that bias toward smaller/cheaper models when appropriate
+  - [ ] 4.9 Create comprehensive test coverage for cost calculations including edge cases and complex scenarios
+
+- [ ] 5.0 JIRA Integration and API Endpoints
+  - [ ] 5.1 Extend existing JIRA integration to support agentic workforce task creation and updates
+  - [ ] 5.2 Implement webhook handlers for JIRA task events that trigger agent assignment workflows
+  - [ ] 5.3 Create API endpoints for creating Admin-assigned tickets for infrastructure and model service failures
+  - [ ] 5.4 Implement proper authentication and authorization for all new API endpoints
+  - [ ] 5.5 Create API documentation and OpenAPI specifications for all HR and orchestration endpoints
+  - [ ] 5.6 Implement error handling and logging for JIRA integration with proper retry mechanisms
+  - [ ] 5.7 Create integration points between JIRA tasks and internal task decomposition workflows
+  - [ ] 5.8 Implement comprehensive API testing including authentication, authorization, and error scenarios
+
+- [ ] 6.0 Consensus Algorithms and Agent Intelligence
+  - [ ] 6.1 Implement discrete voting consensus algorithm for simple decision-making scenarios
+  - [ ] 6.2 Implement K-means clustering with silhouette analysis for complex text output consensus
+  - [ ] 6.3 Create hiring manager agent with prompt-based interview capabilities and candidate evaluation
+  - [ ] 6.4 Create recruiter agent for generating synthetic resumes based on job requirements and feedback
+  - [ ] 6.5 Create manager agent for performance evaluation using TDD metrics and SMART goal compliance
+  - [ ] 6.6 Implement agent termination and replacement logic for consistently failing agents
+  - [ ] 6.7 Create comprehensive audit logging for all agent decisions, hiring activities, and performance evaluations
+  - [ ] 6.8 Implement prompt processing service with template support and variable substitution
+  - [ ] 6.9 Create REST API endpoints for hiring process management and agent intelligence operations
+  - [ ] 6.10 Implement comprehensive test coverage for all consensus algorithms and agent intelligence workflows
