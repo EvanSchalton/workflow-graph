@@ -1,0 +1,4 @@
+# Database Migration Dependencies
+# Install with: pip install -r requirements.txt
+
+asyncpg==0.29.0
