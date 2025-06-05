@@ -1,4 +1,12 @@
 from invoke import task, Context
+import sys
+import os
+from pathlib import Path
+
+# Add the parent directory to sys.path if it's not already there
+workspace_dir = Path(__file__).parent
+if str(workspace_dir) not in sys.path:
+    sys.path.insert(0, str(workspace_dir))
 
 @task
 def run(c: Context, port=8080):
@@ -7,8 +15,16 @@ def run(c: Context, port=8080):
 
 @task
 def test(c: Context, path: str = "", verbose: bool = False, log: bool = False, keyword: str | None = None):
-    """Run the test suite using pytest. Optionally specify a path to test specific files/directories."""
-    command = f"pytest {path}".strip()
+    """
+    Run the test suite using pytest.
+    Parameters:
+    path: optional, specific path to test files or directories.
+    verbose: optional, if True, run pytest in verbose mode.
+    log: optional, if True, redirect output to a log file (test.log).
+    keyword: optional, run tests matching the specified keyword expression.
+    """
+    # Use python -m pytest to ensure proper module resolution
+    command = f"python -m pytest {path}".strip()
     
     if keyword:
         command += f" -k {keyword}"

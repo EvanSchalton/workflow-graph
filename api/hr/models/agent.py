@@ -3,7 +3,7 @@ Agent model for workforce management.
 Represents synthetic agents with resumes and job assignments.
 """
 
-from typing import Optional, Dict, Any, TYPE_CHECKING
+from typing import Optional, Dict, Any, List, TYPE_CHECKING
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column
@@ -14,6 +14,7 @@ import json
 if TYPE_CHECKING:
     from .job_description import JobDescription
     from .resume import Resume
+    from ...orchestration.models.task_assignment import TaskAssignment
     from .job_application import JobApplication
 
 
@@ -68,7 +69,7 @@ class Agent(SQLModel, table=True):
     # Relationships
     resume: Optional["Resume"] = Relationship(back_populates="agent")
     job_description: Optional["JobDescription"] = Relationship(back_populates="agents")
-    # task_assignments will be added when task models are created
+    assignments: List["TaskAssignment"] = Relationship(back_populates="agent")
     
     @field_validator('name')
     @classmethod
