@@ -7,7 +7,7 @@ This script handles running SQL migration files in order.
 import os
 import sys
 import asyncio
-import asyncpg
+import asyncpg  # type: ignore
 from pathlib import Path
 from typing import List, Tuple
 import logging

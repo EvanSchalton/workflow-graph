@@ -8,7 +8,7 @@ from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import ARRAY
-from pydantic import field_validator, model_validator
+from pydantic import field_validator
 import enum
 
 if TYPE_CHECKING:

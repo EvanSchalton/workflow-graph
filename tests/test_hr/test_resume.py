@@ -4,7 +4,7 @@ Tests for the Resume model.
 
 import pytest
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 from api.hr.models.resume import (
     Resume, 

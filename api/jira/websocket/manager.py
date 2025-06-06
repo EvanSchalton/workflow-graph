@@ -1,5 +1,3 @@
-from typing import List
-from fastapi.websockets import WebSocket
 from ..models.events.base_event import BaseEvent
 from .connection import WebsocketConnection
 
@@ -15,7 +13,7 @@ class WebsocketManager:
         self.active_connections[id(connection.websocket)] = connection
         print(f"WebSocket connected: {connection}")
 
-    async def disconnect(self, connection: WebsocketConnection):
+    async def disconnect(self, connection: WebsocketConnection) -> None:
         print(f"Disconnecting: {connection}")
         del self.active_connections[id(connection.websocket)]
 

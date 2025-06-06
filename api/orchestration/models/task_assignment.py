@@ -3,7 +3,7 @@ TaskAssignment model for orchestration service.
 Represents assignment of tasks to agents with cost and quality tracking.
 """
 
-from typing import Optional, TYPE_CHECKING, ForwardRef
+from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 from decimal import Decimal
 from sqlmodel import SQLModel, Field, Relationship

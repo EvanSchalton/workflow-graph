@@ -3,17 +3,17 @@ ModelCatalog model for cost tracking service.
 Represents AI models with their costs, capabilities, and performance characteristics.
 """
 
-from typing import List, Optional, Dict, Any, TYPE_CHECKING, Union
+from typing import List, Optional, Any, TYPE_CHECKING, Union
 from datetime import datetime
 from decimal import Decimal
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
-from pydantic import field_validator, model_validator, ConfigDict
+from pydantic import field_validator, model_validator
 import enum
 
 if TYPE_CHECKING:
-    from .execution_cost import ExecutionCost
+    pass
 
 
 class PerformanceTier(str, enum.Enum):
@@ -195,11 +195,12 @@ class ModelCatalog(SQLModel, table=True):
         multiplier = tier_multipliers.get(self.performance_tier, Decimal('1.0'))
         return avg_cost_per_token * multiplier
     
-    model_config = ConfigDict(
+    model_config = {  # type: ignore
         # Note: json_encoders is deprecated, use custom serializers instead
         # For now, removed to eliminate deprecation warnings
-        arbitrary_types_allowed=True
-    )
+        "arbitrary_types_allowed": True,
+        "from_attributes": True
+    }
         
     def __repr__(self) -> str:
         """String representation for debugging."""

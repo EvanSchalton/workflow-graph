@@ -1,4 +1,3 @@
-import pytest
 
 def test_create_board(client, test_uuid):
     """Test creating a board."""

@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker, Session
-from typing import List
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.sql import text
 from sqlmodel import SQLModel
 import os
@@ -22,13 +20,12 @@ async def lifespan(
     schema = os.getenv("DATABASE_SCHEMA", "public")
     engine = create_async_engine(database_url, echo=True)
 
-    # Fix sessionmaker arguments
-    session_maker = sessionmaker( # type: ignore
+    # Create session maker for async sessions
+    session_maker = async_sessionmaker(
         bind=engine,
-        class_=AsyncSession,
         expire_on_commit=False
     )
-    session: Session = session_maker()
+    session: AsyncSession = session_maker()
 
     # Create tables in the specified schema
     async with engine.begin() as conn:

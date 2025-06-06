@@ -1,9 +1,9 @@
-import pytest
-from typing import Generator
-from uuid import uuid4
-from pathlib import Path
-import sys
 import os
+import sys
+import pytest
+from pathlib import Path
+from typing import Generator, Dict, Any
+from uuid import uuid4
 from fastapi.testclient import TestClient
 from unittest.mock import patch, AsyncMock
 
@@ -11,8 +11,9 @@ from unittest.mock import patch, AsyncMock
 workspace_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(workspace_root))
 
-from api.jira.main import app
-from api.jira.routes.dependencies.get_session import get_session
+# Import JIRA modules after adding workspace root to path
+from api.jira.main import app  # noqa: E402
+from api.jira.routes.dependencies.get_session import get_session  # noqa: E402
 
 @pytest.fixture
 def test_uuid():
@@ -26,8 +27,8 @@ def client() -> Generator[TestClient, None, None]:
     os.environ["DATABASE_SCHEMA"] = "test"
     
     # Shared data store across all session instances within the same test
-    shared_data = {}
-    next_ids = {}  # Track next available ID for each model type
+    shared_data: Dict[str, Dict[str, Any]] = {}
+    next_ids: Dict[str, int] = {}  # Track next available ID for each model type
     
     # Create a simple mock session that doesn't cause event loop issues
     class MockAsyncSession:

@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 import httpx
 from .events.base_event import BaseEvent
 from .events.event_code import EventCode

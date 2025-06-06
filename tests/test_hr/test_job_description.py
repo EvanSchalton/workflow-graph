@@ -4,7 +4,7 @@ Tests for the JobDescription model.
 
 import pytest
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import Dict, Any
 
 from api.hr.models.job_description import (
     JobDescription,

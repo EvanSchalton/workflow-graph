@@ -9,6 +9,7 @@ from .task import Task, TaskStatus, TaskPriority
 from .task_assignment import TaskAssignment, AssignmentStatus
 
 __all__ = [
+    'Agent',
     "Task",
     "TaskStatus", 
     "TaskPriority",

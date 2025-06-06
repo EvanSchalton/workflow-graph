@@ -1,4 +1,3 @@
-import pytest
 
 def test_create_column(client, test_uuid):
     """Test creating a column with a valid board."""

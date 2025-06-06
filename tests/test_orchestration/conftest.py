@@ -4,7 +4,6 @@ Pytest configuration for orchestration tests.
 
 import pytest
 from uuid import uuid4
-from datetime import datetime, timedelta
 from decimal import Decimal
 
 
@@ -18,13 +17,13 @@ def test_uuid() -> str:
 def task_factory(test_uuid: str):
     """Factory for creating test task data."""
     def _factory(
-        title: str = None,
-        description: str = None,
-        jira_task_id: str = None,
-        required_skills: list = None,
+        title: str | None = None,
+        description: str | None = None,
+        jira_task_id: str | None = None,
+        required_skills: list | None = None,
         **kwargs
     ):
-        from api.orchestration.models.task import Task, TaskStatus, TaskPriority
+        from api.orchestration.models.task import Task
         
         return Task(
             title=title or f"Test Task {test_uuid[:8]}",
@@ -42,10 +41,10 @@ def assignment_factory(test_uuid: str):
     def _factory(
         task_id: int = 1,
         agent_id: int = 1,
-        capability_score: Decimal = None,
+        capability_score: Decimal | None = None,
         **kwargs
     ):
-        from api.orchestration.models.task_assignment import TaskAssignment, AssignmentStatus
+        from api.orchestration.models.task_assignment import TaskAssignment
         
         return TaskAssignment(
             task_id=task_id,

@@ -7,6 +7,7 @@
 ### General Coding Standards
 - **Type hint everything**: All functions, methods, variables, and parameters should have proper type hints throughout the codebase
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
+- **Handle type checking pragmatically**: Install type stubs for packages when available, but use `# type: ignore` comments when necessary rather than manually creating stubs
 
 ### Test Directory Structure
 - **NO `__init__.py` files in tests directory**: Pytest discovery works better without them and avoids import conflicts
@@ -27,6 +28,7 @@
 - **Write tests to verify actual behavior**: If tests are failing and you're unsure why, add diagnostic tests to understand the current behavior
 - **Don't test Pydantic basics**: Don't test that constructor parameters are assigned to model fields - test custom validators, business logic, and edge cases
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
+- **Fix all warnings**: Address deprecation warnings, type warnings, and other warnings identified during testing
 
 ### TDD Implementation
 - Write failing tests first (Red)
@@ -37,6 +39,9 @@
 ### Task Management
 - Mark completed tasks with `[x]` in task list files
 - Update "Relevant Files" section as files are created/modified
+- **Run quality checks before completion**: Run `mypy` and `ruff` to check for type errors and code quality issues
+- **Fix all quality issues**: Address any errors, warnings, or style issues identified by static analysis tools
+- **Verify complete test coverage**: Only mark a task as complete when both `invoke test` and `invoke check` run clean without filtering (no errors across the entire codebase)
 - Stop after each sub-task completion and wait for user approval
 
 ### SQLModel/SQLAlchemy Patterns

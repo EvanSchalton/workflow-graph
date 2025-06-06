@@ -8,9 +8,9 @@ import json
 from typing import List, Optional, Dict, Any, TYPE_CHECKING
 from datetime import datetime, date
 from sqlmodel import SQLModel, Field, Relationship
-from sqlalchemy import Column, String, Text
+from sqlalchemy import Column, String
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
-from pydantic import field_validator, EmailStr
+from pydantic import field_validator
 from dateutil.parser import parse as parse_date
 
 if TYPE_CHECKING:

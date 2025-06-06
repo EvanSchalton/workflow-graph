@@ -1,4 +1,3 @@
-import pytest
 
 def test_create_ticket(client, test_uuid):
     """Test creating a ticket with a valid column."""

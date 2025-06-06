@@ -1,6 +1,5 @@
 from invoke import task, Context
 import sys
-import os
 from pathlib import Path
 
 # Add the parent directory to sys.path if it's not already there
@@ -43,9 +42,66 @@ def test(c: Context, path: str = "", verbose: bool = False, log: bool = False, k
     c.run(command, pty=True)
 
 @task
-def check(c: Context, log: bool = False):
-    """Run mypy to check for type errors."""
-    command = "poetry run mypy . --explicit-package-bases"
+def mypy(c: Context, path: str = ".", log: bool = False):
+    """
+    Run mypy to check for type errors.
+    Parameters:
+    path: optional, specific path to check (default: current directory).
+    log: optional, if True, redirect output to a log file.
+    """
+    command = f"poetry run mypy {path} --explicit-package-bases"
     if log:
-        command += " > mypy.log"
+        log_file = "mypy.log"
+        if path and path != ".":
+            path_safe = path.replace("/", "_").replace(".", "_")
+            log_file = f"mypy_{path_safe}.log"
+        command += f" > {log_file}"
     c.run(command)
+
+@task
+def ruff_check(c: Context, path: str = ".", log: bool = False):
+    """
+    Run ruff to check for code quality issues.
+    Parameters:
+    path: optional, specific path to check (default: current directory).
+    log: optional, if True, redirect output to a log file.
+    """
+    command = f"poetry run ruff check {path}"
+    if log:
+        log_file = "ruff_check.log"
+        if path and path != ".":
+            path_safe = path.replace("/", "_").replace(".", "_")
+            log_file = f"ruff_check_{path_safe}.log"
+        command += f" > {log_file}"
+    c.run(command)
+
+@task
+def ruff_fix(c: Context, path: str = ".", log: bool = False):
+    """
+    Run ruff to automatically fix code quality issues.
+    Parameters:
+    path: optional, specific path to fix (default: current directory).
+    log: optional, if True, redirect output to a log file.
+    """
+    command = f"poetry run ruff check {path} --fix"
+    if log:
+        log_file = "ruff_fix.log"
+        if path and path != ".":
+            path_safe = path.replace("/", "_").replace(".", "_")
+            log_file = f"ruff_fix_{path_safe}.log"
+        command += f" > {log_file}"
+    c.run(command)
+
+@task
+def check(c: Context, path: str = ".", log: bool = False):
+    """
+    Run all code quality checks (mypy and ruff).
+    Parameters:
+    path: optional, specific path to check (default: current directory).
+    log: optional, if True, redirect output to a log file.
+    """
+    print(f"Running mypy type checking on {path}...")
+    mypy(c, path, log)
+    print(f"Running ruff code quality checks on {path}...")
+    ruff_check(c, path, log)
+    print("All quality checks completed.")

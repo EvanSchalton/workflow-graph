@@ -5,8 +5,7 @@ This script tests the migration system by running migrations and verifying the s
 """
 
 import asyncio
-import asyncpg
-import os
+import asyncpg  # type: ignore
 import sys
 from pathlib import Path
 import pytest
@@ -14,7 +13,7 @@ import pytest
 # Add the parent directory to the path so we can import the migration module
 sys.path.insert(0, str(Path(__file__).parent))
 
-from migrate import DATABASE_URL, create_migration_table, get_executed_migrations
+from migrate import DATABASE_URL, create_migration_table, get_executed_migrations  # type: ignore
 
 @pytest.mark.asyncio
 async def test_migration_system():

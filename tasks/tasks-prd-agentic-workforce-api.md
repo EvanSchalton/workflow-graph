@@ -88,7 +88,7 @@
   - [x] 1.2 Implement SQLAlchemy models for HR management (JobDescription, Resume, JobApplication, Agent)
   - [x] 1.3 Implement SQLAlchemy models for task orchestration (Task, TaskAssignment)
   - [x] 1.4 Implement SQLAlchemy models for cost tracking (ModelCatalog, ExecutionCost)
-  - [ ] 1.5 Implement SQLAlchemy models for prompt management (TaskPrompt, ResumePrompt)
+  - [x] 1.5 Implement SQLAlchemy models for prompt management (TaskPrompt, ResumePrompt)
   - [ ] 1.6 Implement shared models (AuditLog) with proper foreign key relationships
   - [ ] 1.7 Create database indexes for performance optimization on frequently queried fields
   - [ ] 1.8 Write comprehensive unit tests for all data models including edge cases and validation

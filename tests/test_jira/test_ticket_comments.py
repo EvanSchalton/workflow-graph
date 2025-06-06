@@ -1,5 +1,3 @@
-import pytest
-from api.jira.models import TicketComment
 
 def test_create_comment(client, test_uuid):
     """Test creating a comment on a ticket."""

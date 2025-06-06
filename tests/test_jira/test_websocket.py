@@ -1,7 +1,4 @@
-import pytest
 from fastapi.testclient import TestClient
-from api.jira.models.events.board_event import BoardEvent
-from api.jira.models.events.event_code import EventCode
 
 def test_websocket_connect(client: TestClient) -> None:
     """Test that a websocket connection can be established."""

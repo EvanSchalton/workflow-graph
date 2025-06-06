@@ -39,7 +39,7 @@ def test_assignment_creation_with_custom_values(test_uuid: str):
     assert assignment.status == AssignmentStatus.IN_PROGRESS
     assert assignment.capability_score == Decimal("92.5")
     assert assignment.cost_estimate == Decimal("75.00")
-    assert test_uuid in assignment.completion_notes
+    assert assignment.completion_notes is not None and test_uuid in assignment.completion_notes
 
 
 @pytest.mark.parametrize("status,expected", [

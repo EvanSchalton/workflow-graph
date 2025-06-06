@@ -6,10 +6,10 @@ Represents costs incurred from AI model executions by agents on tasks.
 from typing import Optional, Dict, Any, TYPE_CHECKING, Union
 from datetime import datetime
 from decimal import Decimal
-from sqlmodel import SQLModel, Field, Relationship
+from sqlmodel import SQLModel, Field
 from sqlalchemy import Column
 from sqlalchemy.dialects.postgresql import JSONB
-from pydantic import field_validator, model_validator, ConfigDict
+from pydantic import field_validator, model_validator
 
 if TYPE_CHECKING:
     from .model_catalog import ModelCatalog
@@ -243,11 +243,12 @@ class ExecutionCost(SQLModel, table=True):
         new_metadata[key] = value
         self.execution_metadata = new_metadata
     
-    model_config = ConfigDict(
+    model_config = {  # type: ignore
         # Note: json_encoders is deprecated, use custom serializers instead
         # For now, removed to eliminate deprecation warnings
-        arbitrary_types_allowed=True
-    )
+        "arbitrary_types_allowed": True,
+        "from_attributes": True
+    }
     
     def __repr__(self) -> str:
         """String representation for debugging."""

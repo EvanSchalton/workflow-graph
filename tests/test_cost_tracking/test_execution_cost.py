@@ -193,6 +193,7 @@ def test_execution_cost_get_execution_efficiency_score(test_execution_cost_data:
     
     # Score should be based on cost per token plus time penalty
     cost_per_token = cost.get_cost_per_token()
+    assert cost_per_token is not None
     assert score > cost_per_token  # Should be higher due to time penalty
     
     # Execution without tokens should return None
@@ -252,7 +253,7 @@ def test_execution_cost_metadata_helpers(test_execution_cost_data: Dict[str, Any
     
     # Set metadata with non-string key should raise error
     with pytest.raises(ValueError, match="Metadata key must be a string"):
-        cost.set_metadata_value(123, "value")
+        cost.set_metadata_value(123, "value")  # type: ignore
 
 
 @pytest.mark.parametrize("input_tokens,output_tokens,expected_efficiency_order", [
