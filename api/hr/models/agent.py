@@ -14,7 +14,6 @@ import json
 if TYPE_CHECKING:
     from .job_description import JobDescription
     from .resume import Resume
-    from ...orchestration.models.task_assignment import TaskAssignment
     from .job_application import JobApplication
 
 
@@ -69,7 +68,8 @@ class Agent(SQLModel, table=True):
     # Relationships
     resume: Optional["Resume"] = Relationship(back_populates="agent")
     job_description: Optional["JobDescription"] = Relationship(back_populates="agents")
-    assignments: List["TaskAssignment"] = Relationship(back_populates="agent")
+    # Note: assignments and execution_costs relationships are defined via foreign keys
+    # to avoid circular import issues during SQLAlchemy mapper initialization
     
     @field_validator('name')
     @classmethod

@@ -12,7 +12,6 @@ class WebsocketManager:
         connection: WebsocketConnection,
     ) -> None:
         print(f"Attempting to connect WebSocket: {connection}")
-        await connection.websocket.accept()
         self.active_connections[id(connection.websocket)] = connection
         print(f"WebSocket connected: {connection}")
 

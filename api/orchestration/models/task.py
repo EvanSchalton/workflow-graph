@@ -116,6 +116,8 @@ class Task(SQLModel, table=True):
         back_populates="task",
         cascade_delete=True
     )
+    # Note: execution_costs relationship is defined via foreign keys
+    # to avoid circular import issues during SQLAlchemy mapper initialization
     
     # Self-referential relationship for parent/child tasks
     subtasks: List["Task"] = Relationship(

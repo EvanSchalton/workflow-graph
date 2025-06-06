@@ -9,12 +9,14 @@ import asyncpg
 import os
 import sys
 from pathlib import Path
+import pytest
 
 # Add the parent directory to the path so we can import the migration module
 sys.path.insert(0, str(Path(__file__).parent))
 
 from migrate import DATABASE_URL, create_migration_table, get_executed_migrations
 
+@pytest.mark.asyncio
 async def test_migration_system():
     """Test the migration system by verifying table creation and constraints."""
     print("Testing migration system...")

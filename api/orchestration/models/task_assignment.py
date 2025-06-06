@@ -102,8 +102,8 @@ class TaskAssignment(SQLModel, table=True):
     )
     
     # Relationships
-    task: "Task" = Relationship(back_populates="assignments")
-    agent: "Agent" = Relationship(back_populates="assignments", sa_relationship_kwargs={"foreign_keys": "[TaskAssignment.agent_id]"})
+    task: "Task" = Relationship(sa_relationship_kwargs={"foreign_keys": "[TaskAssignment.task_id]"})
+    agent: "Agent" = Relationship(sa_relationship_kwargs={"foreign_keys": "[TaskAssignment.agent_id]"})
 
     @field_validator('capability_score', 'quality_score', mode='before')
     @classmethod
