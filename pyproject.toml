@@ -33,3 +33,15 @@ types-python-dateutil = "^2.9.0.20250516"
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
 
+[tool.mypy]
+# Exclude notebook files from mypy checking
+exclude = [
+    ".*\\.ipynb$"
+]
+
+[tool.ruff]
+# Exclude notebook files from ruff checking
+exclude = [
+    "*.ipynb"
+]
+

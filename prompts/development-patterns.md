@@ -9,6 +9,13 @@
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
 - **Handle type checking pragmatically**: Install type stubs for packages when available, but use `# type: ignore` comments when necessary rather than manually creating stubs
 
+### Dependency Management
+- **Use Poetry for dependency management**: All package installations and dependency management should use Poetry, not pip
+- **Add dependencies with Poetry**: Use `poetry add <package>` for runtime dependencies and `poetry add --group dev <package>` for development dependencies
+- **Install dependencies**: Use `poetry install` to install all dependencies from the lock file
+- **Update dependencies**: Use `poetry update` to update dependencies while respecting version constraints
+- **Virtual environment**: Poetry automatically manages the virtual environment; use `poetry shell` or `poetry run <command>` to execute commands in the environment
+
 ### Test Directory Structure
 - **NO `__init__.py` files in tests directory**: Pytest discovery works better without them and avoids import conflicts
 - Follow structure: `tests/test_module/test_submodule/test_file.py`
