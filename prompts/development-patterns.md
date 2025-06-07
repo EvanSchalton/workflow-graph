@@ -38,6 +38,10 @@
 - **Don't test Pydantic basics**: Don't test that constructor parameters are assigned to model fields - test custom validators, business logic, and edge cases
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
 - **Fix all warnings**: Address deprecation warnings, type warnings, and other warnings identified during testing
+- **Keep test files manageable**: Break up large test files into smaller, feature-focused files instead of creating monolithic test files
+- **Feature-segmented test organization**: Group tests by feature, functionality, or logical component rather than putting all tests for a module in a single file
+- **Test file size limits**: Aim to keep test files under 300-500 lines to maintain readability and ease of maintenance
+- **Logical test grouping**: Create separate test files for different aspects of complex modules (e.g., `test_model_validation.py`, `test_model_operations.py` instead of a single `test_model.py`)
 
 ### Test Coverage Requirements
 - **Target 100% branch and statement coverage**: Strive for complete code coverage to ensure all code paths are tested
