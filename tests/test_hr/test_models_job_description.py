@@ -1,5 +1,6 @@
 """
 Tests for the JobDescription model.
+This file tests the model directly, not the service layer.
 """
 
 import pytest

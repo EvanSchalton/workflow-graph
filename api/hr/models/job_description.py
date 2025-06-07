@@ -7,7 +7,7 @@ from typing import List, Optional, TYPE_CHECKING
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, String
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from pydantic import field_validator
 import enum
 
@@ -44,9 +44,9 @@ class JobDescription(SQLModel, table=True):
     required_skills: List[str] = Field(
         default_factory=list, 
         description="List of required skills for this position",
-        sa_column=Column(ARRAY(String))
+        sa_column=Column(JSONB)
     )
-    experience_level: ExperienceLevel = Field(description="Required experience level")
+    experience_level: ExperienceLevel = Field(description="Required experience level", sa_column=Column(String(50)))
     
     # Optional fields
     department: Optional[str] = Field(

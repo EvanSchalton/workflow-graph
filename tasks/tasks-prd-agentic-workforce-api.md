@@ -3,6 +3,9 @@
 - `api/hr/__init__.py` - HR management service package initialization
 - `api/hr/models/job_description.py` - Job description data model with CRUD operations
 - `api/hr/models/job_description.test.py` - Unit tests for job description model
+- `api/hr/services/__init__.py` - HR management service package initialization
+- `api/hr/services/job_description.py` - Job description service with CRUD operations and business logic
+- `api/hr/services/job_description.test.py` - Unit tests for job description service
 - `api/hr/models/resume.py` - Resume data model with skills and experience tracking
 - `api/hr/models/resume.test.py` - Unit tests for resume model
 - `api/hr/models/job_application.py` - Job application model linking resumes to jobs
@@ -96,7 +99,7 @@
   - [x] 1.8 Write comprehensive unit tests for all data models including edge cases and validation
 
 - [ ] 2.0 HR Management Service Implementation
-  - [ ] 2.1 Implement CRUD operations for job descriptions with validation and business logic
+  - [x] 2.1 Implement CRUD operations for job descriptions with validation and business logic
   - [ ] 2.2 Implement CRUD operations for synthetic resumes with skills tracking and experience management
   - [ ] 2.3 Implement job application management with status tracking (applied, interviewing, hired, rejected)
   - [ ] 2.4 Implement active agent roster management with configuration and model assignment tracking

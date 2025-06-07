@@ -8,6 +8,8 @@
 - **Type hint everything**: All functions, methods, variables, and parameters should have proper type hints throughout the codebase
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
 - **Handle type checking pragmatically**: Install type stubs for packages when available, but use `# type: ignore` comments when necessary rather than manually creating stubs
+- **One function or class per file**: Each file should include only one function or one class and the file should be named after that function or class
+- **SQL in separate files**: SQL queries should be stored in separate *.sql files in a 'sql' directory (one sql directory per service) and loaded using pathlib.Path
 
 ### Dependency Management
 - **Use Poetry for dependency management**: All package installations and dependency management should use Poetry, not pip
@@ -69,4 +71,6 @@
 - Use `Column` with `sa_column` parameter for complex types like arrays
 - Import SQLAlchemy types when SQLModel doesn't support them natively
 - Use PostgreSQL ARRAY type for list fields: `sa_column=Column(ARRAY(String))`
+- Store SQL queries in *.sql files within a 'sql' directory structure (e.g., `api/hr/sql/job_description/find_by_skills.sql`)
+- Load SQL queries using pathlib: `(Path(__file__).parent / "../sql/job_description/find_by_skills.sql").read_text()`
 
