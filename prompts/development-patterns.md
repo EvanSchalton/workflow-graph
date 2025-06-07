@@ -8,8 +8,17 @@
 - **Type hint everything**: All functions, methods, variables, and parameters should have proper type hints throughout the codebase
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
 - **Handle type checking pragmatically**: Install type stubs for packages when available, but use `# type: ignore` comments when necessary rather than manually creating stubs
-- **One function or class per file**: Each file should include only one function or one class and the file should be named after that function or class
+- **One function or class per file for business logic**: Each business logic function or DAO function should be in its own file named after that function. Exception: API routes, CLI commands, and orchestration files may contain multiple functions that handle parameter marshalling, dependency injection, and delegation to business logic functions
 - **SQL in separate files**: SQL queries should be stored in separate *.sql files in a 'sql' directory (one sql directory per service) and loaded using pathlib.Path
+
+### Code Organization Patterns
+- **Business Logic Functions**: Each business logic function should be in its own file (e.g., `create_user.py`, `validate_email.py`)
+- **DAO Functions**: Database access functions should be segmented per file (e.g., `get_user_by_id.py`, `update_user_status.py`)
+- **Service Classes**: Complex services with multiple related operations can be in a single class file, but delegate to individual function files for actual operations
+- **API Routes**: Route files may contain multiple endpoint functions that handle HTTP-specific concerns (parameter validation, response formatting, dependency injection) and delegate to business logic functions
+- **CLI Commands**: Command-line interface files may contain multiple command functions that handle argument parsing and delegate to business logic functions
+- **Main/Entry Point Files**: Application entry points and orchestration files may contain multiple functions for initialization, configuration, and coordination
+- **Module Transition Pattern**: When creating a new sub-module with one-function-per-file structure, remove the original orchestration Python file and move its imports and `__all__` exports to the new directory's `__init__.py` file. This ensures clean module organization without import conflicts between files and directories with the same name
 
 ### Dependency Management
 - **Use Poetry for dependency management**: All package installations and dependency management should use Poetry, not pip

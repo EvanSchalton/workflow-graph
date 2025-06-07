@@ -13,7 +13,12 @@ import pytest
 # Add the parent directory to the path so we can import the migration module
 sys.path.insert(0, str(Path(__file__).parent))
 
-from migrate import DATABASE_URL, create_migration_table, get_executed_migrations  # type: ignore
+# Import individual function modules
+from create_migration_table import create_migration_table
+from get_executed_migrations import get_executed_migrations
+
+# Database URL - Use postgresql scheme for asyncpg
+DATABASE_URL = "postgresql://jira:jira@docker.lan:5432/postgres"
 
 @pytest.mark.asyncio
 async def test_migration_system():

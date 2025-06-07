@@ -5,7 +5,6 @@ Tests for the AuditLog model.
 import pytest
 from datetime import datetime
 from typing import Dict, Any
-from pydantic import ValidationError
 
 from api.shared.models.audit_log import (
     AuditLog,

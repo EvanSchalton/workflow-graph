@@ -4,7 +4,7 @@ Test to validate schema definitions match between SQLAlchemy models and the Post
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import text, inspect
+from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
 

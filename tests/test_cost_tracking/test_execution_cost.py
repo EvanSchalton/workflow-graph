@@ -8,7 +8,7 @@ from typing import Dict, Any, TYPE_CHECKING
 
 # Test import coverage for TYPE_CHECKING block
 if TYPE_CHECKING:
-    from api.cost_tracking.models.model_catalog import ModelCatalog
+    pass
 
 from api.cost_tracking.models.execution_cost import ExecutionCost
 

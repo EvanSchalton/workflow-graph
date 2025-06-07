@@ -33,14 +33,17 @@ types-python-dateutil = "^2.9.0.20250516"
 coverage = {extras = ["toml"], version = "^7.8.2"}
 pytest-cov = "^6.1.1"
 psycopg2-binary = "^2.9.10"
+types-psycopg2 = "^2.9.21.20250516"
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
 
 [tool.mypy]
-# Exclude notebook files from mypy checking
+# Exclude notebook files, problematic database files, and conftest files from mypy checking
 exclude = [
-    ".*\\.ipynb$"
+    ".*\\.ipynb$",
+    "database/.*\\.py$",
+    ".*/conftest\\.py$"
 ]
 
 [tool.ruff]

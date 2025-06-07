@@ -462,14 +462,14 @@ def test_agent_json_validator_non_dict_types():
     
     # Test configuration validator with non-dict value that's not a string
     try:
-        result = AgentClass.validate_configuration(42)
+        AgentClass.validate_configuration(42)
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Configuration must be a dictionary" in str(e)
     
     # Test configuration validator with JSON string that parses to non-dict
     try:
-        result = AgentClass.validate_configuration('"string_value"')
+        AgentClass.validate_configuration('"string_value"')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Configuration must be a dictionary" in str(e)
@@ -481,14 +481,14 @@ def test_agent_execution_parameters_validator_non_dict():
     
     # Test execution_parameters validator with non-dict value
     try:
-        result = AgentClass.validate_execution_parameters(["list", "value"])
+        AgentClass.validate_execution_parameters(["list", "value"])
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Execution parameters must be a dictionary" in str(e)
     
     # Test execution_parameters validator with JSON string that parses to non-dict
     try:
-        result = AgentClass.validate_execution_parameters('["array", "value"]')
+        AgentClass.validate_execution_parameters('["array", "value"]')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Execution parameters must be a dictionary" in str(e)
@@ -500,14 +500,14 @@ def test_agent_performance_metrics_validator_non_dict():
     
     # Test performance_metrics validator with non-dict value
     try:
-        result = AgentClass.validate_performance_metrics(42)
+        AgentClass.validate_performance_metrics(42)
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Performance metrics must be a dictionary" in str(e)
     
     # Test performance_metrics validator with JSON string that parses to non-dict
     try:
-        result = AgentClass.validate_performance_metrics('42')
+        AgentClass.validate_performance_metrics('42')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Performance metrics must be a dictionary" in str(e)
@@ -519,21 +519,21 @@ def test_agent_json_validators_with_invalid_json():
     
     # Test configuration validator with invalid JSON
     try:
-        result = AgentClass.validate_configuration('{invalid json}')
+        AgentClass.validate_configuration('{invalid json}')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Configuration must be valid JSON" in str(e)
     
     # Test execution_parameters validator with invalid JSON
     try:
-        result = AgentClass.validate_execution_parameters('{invalid: json}')
+        AgentClass.validate_execution_parameters('{invalid: json}')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Execution parameters must be valid JSON" in str(e)
     
     # Test performance_metrics validator with invalid JSON
     try:
-        result = AgentClass.validate_performance_metrics('{incomplete: json')
+        AgentClass.validate_performance_metrics('{incomplete: json')
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Performance metrics must be valid JSON" in str(e)
@@ -545,21 +545,21 @@ def test_agent_json_validators_with_type_error():
     
     # Test configuration validator with non-dict, non-string input
     try:
-        result = AgentClass.validate_configuration(None)
+        AgentClass.validate_configuration(None)
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Configuration must be a dictionary" in str(e)
     
     # Test execution_parameters validator with non-dict, non-string input  
     try:
-        result = AgentClass.validate_execution_parameters(None)
+        AgentClass.validate_execution_parameters(None)
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Execution parameters must be a dictionary" in str(e)
     
     # Test performance_metrics validator with non-dict, non-string input
     try:
-        result = AgentClass.validate_performance_metrics(None)
+        AgentClass.validate_performance_metrics(None)
         assert False, "Should have raised ValueError"
     except ValueError as e:
         assert "Performance metrics must be a dictionary" in str(e)

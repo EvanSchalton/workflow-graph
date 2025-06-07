@@ -828,7 +828,7 @@ def test_task_validator_behavior_diagnostic() -> None:
         description="Test description",
         required_skills=["python", "", "  ", "fastapi", "python"]
     )
-    print(f"Input: ['python', '', '  ', 'fastapi', 'python']")
+    print("Input: ['python', '', '  ', 'fastapi', 'python']")
     print(f"Output: {task.required_skills}")
     print(f"Length: {len(task.required_skills)}")
     
@@ -839,14 +839,14 @@ def test_task_validator_behavior_diagnostic() -> None:
         description="Test description",
         dependencies=[1, 2, 3, 2, 1, 3]
     )
-    print(f"Input: [1, 2, 3, 2, 1, 3]")
+    print("Input: [1, 2, 3, 2, 1, 3]")
     print(f"Output: {task2.dependencies}")
     print(f"Length: {len(task2.dependencies)}")
     
     # Test 3: Check if ValueError is raised for invalid input
     print("\n=== Testing validator error behavior ===")
     try:
-        task3 = Task(
+        Task(
             title="Test Task 3",
             description="Test description",
             required_skills="not a list"
@@ -868,7 +868,7 @@ def test_task_validator_with_model_validate_diagnostic() -> None:
         "description": "Test description",
         "required_skills": ["python", "", "  ", "fastapi", "python"]
     })
-    print(f"Input: ['python', '', '  ', 'fastapi', 'python']")
+    print("Input: ['python', '', '  ', 'fastapi', 'python']")
     print(f"Output: {task.required_skills}")
     print(f"Length: {len(task.required_skills)}")
     
@@ -879,14 +879,14 @@ def test_task_validator_with_model_validate_diagnostic() -> None:
         "description": "Test description",
         "dependencies": [1, 2, 3, 2, 1, 3]
     })
-    print(f"Input: [1, 2, 3, 2, 1, 3]")
+    print("Input: [1, 2, 3, 2, 1, 3]")
     print(f"Output: {task2.dependencies}")
     print(f"Length: {len(task2.dependencies)}")
     
     # Test 3: Check if ValueError is raised for invalid input with model_validate
     print("\n=== Testing validator error behavior with model_validate ===")
     try:
-        task3 = Task.model_validate({
+        Task.model_validate({
             "title": "Test Task 3",
             "description": "Test description",
             "required_skills": "not a list"

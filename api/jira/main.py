@@ -5,8 +5,8 @@ from .routes import (
     ticket_router,
     webhook_router,
     ticket_comments_router,
+    mcp_router,
 )
-from .routes.mcp import router as mcp_router
 from .lifespan import lifespan, DATABASE_URL
 from .websocket import websocket_router
 

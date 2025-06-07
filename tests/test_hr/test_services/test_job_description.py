@@ -5,12 +5,12 @@ Tests for job description service CRUD operations.
 import pytest
 import pytest_asyncio
 from datetime import datetime
-from typing import List, Dict, Any, AsyncGenerator, Callable, Optional
+from typing import List, Any, AsyncGenerator, Optional
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
-from sqlalchemy import Column, String, Text, text
-from sqlmodel import SQLModel, Field
+from sqlalchemy import text
+from sqlmodel import SQLModel
 
 from api.hr.models.job_description import (
     ExperienceLevel,
@@ -32,7 +32,6 @@ from api.hr.services.job_description import (
 DATABASE_URL = "postgresql+asyncpg://jira:jira@docker.lan:5432/postgres"
 
 # Import the actual model - no need for a SQLite workaround
-from api.hr.models.job_description import JobDescription
 
 
 @pytest_asyncio.fixture
