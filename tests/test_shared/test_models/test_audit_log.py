@@ -5,6 +5,7 @@ Tests for the AuditLog model.
 import pytest
 from datetime import datetime
 from typing import Dict, Any
+from pydantic import ValidationError
 
 from api.shared.models.audit_log import (
     AuditLog,
@@ -359,3 +360,55 @@ def test_enum_string_conversion() -> None:
     assert audit_log.entity_type == EntityType.AGENT
     assert audit_log.action == AuditAction.COMPLETE
     assert audit_log.actor_type == ActorType.WEBHOOK
+
+
+def test_model_validation_comprehensive() -> None:
+    """Test comprehensive model validation scenarios."""
+    # Test that validation works for various combinations
+    # Focus on paths that can be reached
+    
+    # Valid metadata_info with dict
+    audit_log = AuditLog.model_validate({
+        "entity_type": EntityType.TASK,
+        "entity_id": 1,
+        "action": AuditAction.CREATE,
+        "actor_type": ActorType.SYSTEM,
+        "metadata_info": {"valid": "dict"}
+    })
+    assert audit_log.metadata_info == {"valid": "dict"}
+    
+    # Test edge cases for positive integers
+    valid_log = AuditLog.model_validate({
+        "entity_type": EntityType.TASK,
+        "entity_id": 999999,  # Large positive number
+        "action": AuditAction.CREATE,
+        "actor_type": ActorType.USER,
+        "actor_id": 999999,   # Large positive number
+        "metadata_info": {}
+    })
+    assert valid_log.entity_id == 999999
+    assert valid_log.actor_id == 999999
+
+
+def test_comprehensive_field_validation_edge_cases() -> None:
+    """Test edge cases for field validation."""
+    # Test metadata_info with various types
+    valid_metadata = {"key1": "value1", "key2": 42, "key3": [1, 2, 3], "key4": {"nested": True}}
+    audit_log = AuditLog.model_validate({
+        "entity_type": EntityType.TASK,
+        "entity_id": 1,
+        "action": AuditAction.CREATE,
+        "actor_type": ActorType.SYSTEM,
+        "metadata_info": valid_metadata
+    })
+    assert audit_log.metadata_info == valid_metadata
+    
+    # Test that actor_id None is valid
+    audit_log_no_actor = AuditLog.model_validate({
+        "entity_type": EntityType.TASK,
+        "entity_id": 1,
+        "action": AuditAction.CREATE,
+        "actor_type": ActorType.SYSTEM,
+        "actor_id": None
+    })
+    assert audit_log_no_actor.actor_id is None

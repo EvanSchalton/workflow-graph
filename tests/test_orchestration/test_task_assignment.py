@@ -232,3 +232,181 @@ def test_assignment_actual_cost_constraint_validation():
             "actual_cost": Decimal("100.00")
         }
         TaskAssignment.model_validate(data)
+
+
+# Additional tests for comprehensive coverage
+
+def test_assignment_update_status_edge_cases():
+    """Test edge cases for update_status method."""
+    assignment = TaskAssignment(
+        task_id=1,
+        agent_id=2,
+        status=AssignmentStatus.ASSIGNED
+    )
+    
+    # Test transition from non-terminal to terminal status with notes
+    assignment.update_status(AssignmentStatus.COMPLETED, "Task completed successfully")
+    assert assignment.status == AssignmentStatus.COMPLETED
+    assert assignment.completed_at is not None
+    assert assignment.completion_notes == "Task completed successfully"
+    
+    # Test transition between terminal statuses 
+    original_completed_at = assignment.completed_at
+    assignment.update_status(AssignmentStatus.FAILED, "Task failed due to errors")
+    assert assignment.status == AssignmentStatus.FAILED
+    # Should keep original completion timestamp when transitioning between terminal states
+    assert assignment.completed_at == original_completed_at
+    # completion_notes should remain from original completion since this is terminal-to-terminal
+    assert assignment.completion_notes == "Task completed successfully"
+    
+    # Test transition from terminal to non-terminal status
+    assignment.update_status(AssignmentStatus.IN_PROGRESS)
+    assert assignment.status == AssignmentStatus.IN_PROGRESS
+    assert assignment.completed_at is None
+
+
+def test_assignment_set_quality_score_edge_cases():
+    """Test edge cases for set_quality_score method."""
+    assignment = TaskAssignment(
+        task_id=1,
+        agent_id=2,
+        status=AssignmentStatus.COMPLETED
+    )
+    
+    # Test setting quality score with notes
+    assignment.set_quality_score(Decimal("85.5"), "Good quality work")
+    assert assignment.quality_score == Decimal("85.5")
+    assert assignment.completion_notes == "Good quality work"
+    
+    # Test setting quality score for non-completed assignment
+    assignment.status = AssignmentStatus.IN_PROGRESS
+    with pytest.raises(ValueError, match="Quality score can only be set for completed assignments"):
+        assignment.set_quality_score(Decimal("90.0"))
+    
+    # Test setting invalid quality score ranges
+    assignment.status = AssignmentStatus.COMPLETED
+    with pytest.raises(ValueError, match="Quality score must be between 0 and 100"):
+        assignment.set_quality_score(Decimal("-5.0"))
+    
+    with pytest.raises(ValueError, match="Quality score must be between 0 and 100"):
+        assignment.set_quality_score(Decimal("105.0"))
+
+
+def test_assignment_record_actual_cost_edge_cases():
+    """Test edge cases for record_actual_cost method."""
+    assignment = TaskAssignment(
+        task_id=1,
+        agent_id=2
+    )
+    
+    # Test recording valid cost
+    assignment.record_actual_cost(Decimal("150.75"))
+    assert assignment.actual_cost == Decimal("150.75")
+    
+    # Test recording zero cost (should be allowed)
+    assignment.record_actual_cost(Decimal("0.00"))
+    assert assignment.actual_cost == Decimal("0.00")
+    
+    # Test recording negative cost (should fail)
+    with pytest.raises(ValueError, match="Cost cannot be negative"):
+        assignment.record_actual_cost(Decimal("-10.50"))
+
+
+def test_assignment_calculate_cost_efficiency_edge_cases():
+    """Test edge cases for calculate_cost_efficiency method."""
+    assignment = TaskAssignment(
+        task_id=1,
+        agent_id=2
+    )
+    
+    # Test with no cost estimate
+    assignment.cost_estimate = None
+    assignment.actual_cost = Decimal("100.0")
+    assert assignment.calculate_cost_efficiency() is None
+    
+    # Test with no actual cost
+    assignment.cost_estimate = Decimal("100.0")
+    assignment.actual_cost = None
+    assert assignment.calculate_cost_efficiency() is None
+    
+    # Test with zero actual cost
+    assignment.cost_estimate = Decimal("100.0")
+    assignment.actual_cost = Decimal("0.0")
+    assert assignment.calculate_cost_efficiency() is None
+    
+    # Test with valid costs
+    assignment.cost_estimate = Decimal("100.0")
+    assignment.actual_cost = Decimal("80.0")
+    efficiency = assignment.calculate_cost_efficiency()
+    assert efficiency == Decimal("100.0") / Decimal("80.0")
+
+
+def test_assignment_model_validator_edge_cases():
+    """Test model validator edge cases."""
+    # Test valid completed assignment with all fields
+    assignment = TaskAssignment.model_validate({
+        "task_id": 1,
+        "agent_id": 2,
+        "status": "completed",
+        "completed_at": datetime.utcnow().isoformat(),
+        "quality_score": 85.5,
+        "actual_cost": 100.0
+    })
+    assert assignment.status == AssignmentStatus.COMPLETED
+    
+    # Test invalid: completed timestamp with non-terminal status
+    with pytest.raises(ValueError, match="Completed timestamp can only be set for completed or failed assignments"):
+        TaskAssignment.model_validate({
+            "task_id": 1,
+            "agent_id": 2,
+            "status": "in_progress",
+            "completed_at": datetime.utcnow().isoformat()
+        })
+    
+    # Test invalid: quality score with non-completed status
+    with pytest.raises(ValueError, match="Quality score can only be set for completed assignments"):
+        TaskAssignment.model_validate({
+            "task_id": 1,
+            "agent_id": 2,
+            "status": "in_progress",
+            "quality_score": 85.5
+        })
+    
+    # Test invalid: actual cost with non-terminal status
+    with pytest.raises(ValueError, match="Actual cost can only be set for completed or failed assignments"):
+        TaskAssignment.model_validate({
+            "task_id": 1,
+            "agent_id": 2,
+            "status": "in_progress",
+            "actual_cost": 100.0
+        })
+
+
+def test_assignment_validator_return_paths():
+    """Test validator return paths for coverage."""
+    from api.orchestration.models.task_assignment import TaskAssignment as TAClass
+    
+    # Test score validator with valid values
+    result = TAClass.validate_scores(Decimal("50.0"))
+    assert result == Decimal("50.0")
+    
+    result = TAClass.validate_scores(None)
+    assert result is None
+    
+    # Test cost validator with valid values
+    result = TAClass.validate_costs(Decimal("100.0"))
+    assert result == Decimal("100.0")
+    
+    result = TAClass.validate_costs(None)
+    assert result is None
+
+
+def test_assignment_imports_coverage():
+    """Test to ensure import statements are covered."""
+    from api.orchestration.models.task_assignment import TaskAssignment, AssignmentStatus
+    assert TaskAssignment is not None
+    assert AssignmentStatus is not None
+    
+    # Test enum values
+    assert AssignmentStatus.ASSIGNED == "assigned"
+    assert AssignmentStatus.COMPLETED == "completed"

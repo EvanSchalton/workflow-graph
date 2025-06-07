@@ -13,17 +13,21 @@ def run(c: Context, port=8080):
     c.run(f"uvicorn api.jira.main:app --reload --port {port}", pty=True)
 
 @task
-def test(c: Context, path: str = "", verbose: bool = False, log: bool = False, keyword: str | None = None):
+def test(c: Context, path: str = "", verbose: bool = False, log: bool = False, keyword: str | None = None, coverage: bool = True):
     """
-    Run the test suite using pytest.
+    Run the test suite using pytest with coverage reporting.
     Parameters:
     path: optional, specific path to test files or directories.
     verbose: optional, if True, run pytest in verbose mode.
     log: optional, if True, redirect output to a log file (test.log).
     keyword: optional, run tests matching the specified keyword expression.
+    coverage: optional, if True (default), run with coverage reporting.
     """
     # Use python -m pytest to ensure proper module resolution
     command = f"python -m pytest {path}".strip()
+    
+    if coverage:
+        command += " --cov=api --cov-branch --cov-report=term-missing --cov-report=html  --cov-report=xml"
     
     if keyword:
         command += f" -k {keyword}"
@@ -40,6 +44,26 @@ def test(c: Context, path: str = "", verbose: bool = False, log: bool = False, k
         command += f" > {log_file}"
 
     c.run(command, pty=True)
+
+@task
+def coverage(c: Context, path: str = "", html: bool = True, xml: bool = True):
+    """
+    Run test coverage analysis and generate reports.
+    Parameters:
+    path: optional, specific path to test files or directories.
+    html: optional, if True (default), generate HTML coverage report.
+    """
+    command = f"python -m pytest {path} --cov=api --cov-branch --cov-report=term-missing".strip()
+    
+    if html:
+        command += " --cov-report=html"
+    if xml:
+        command += " --cov-report=xml"
+    
+    c.run(command, pty=True)
+    
+    if html:
+        print("\nHTML coverage report generated in htmlcov/index.html")
 
 @task
 def mypy(c: Context, path: str = ".", log: bool = False):

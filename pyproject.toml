@@ -29,6 +29,8 @@ pytest-asyncio = "^0.26.0"
 mypy = "^1.15.0"
 ruff = "^0.11.13"
 types-python-dateutil = "^2.9.0.20250516"
+coverage = {extras = ["toml"], version = "^7.8.2"}
+pytest-cov = "^6.1.1"
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
@@ -44,4 +46,38 @@ exclude = [
 exclude = [
     "*.ipynb"
 ]
+
+[tool.coverage.run]
+source = ["api"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/.venv/*",
+    "*/venv/*",
+    "test_*.py",
+    "*_test.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod"
+]
+ignore_errors = true
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "htmlcov"
 

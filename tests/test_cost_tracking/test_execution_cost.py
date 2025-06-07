@@ -4,7 +4,11 @@ Tests for the ExecutionCost model.
 
 import pytest
 from decimal import Decimal
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
+
+# Test import coverage for TYPE_CHECKING block
+if TYPE_CHECKING:
+    from api.cost_tracking.models.model_catalog import ModelCatalog
 
 from api.cost_tracking.models.execution_cost import ExecutionCost
 
@@ -319,3 +323,115 @@ def test_execution_cost_repr(test_execution_cost_data: Dict[str, Any]) -> None:
     assert cost.model_name in repr_str
     assert str(cost.total_cost) in repr_str
     assert "ExecutionCost" in repr_str
+
+
+def test_execution_cost_model_catalog_ref_property(test_execution_cost_data: Dict[str, Any]) -> None:
+    """Test model_catalog_ref property accessor."""
+    cost = ExecutionCost.model_validate(test_execution_cost_data)
+    
+    # Property should return None by default
+    assert cost.model_catalog_ref is None
+    
+    # Test setting the private attribute directly (simulating service layer)
+    mock_catalog = "mock_catalog_ref"
+    cost._model_catalog_ref = mock_catalog  # type: ignore
+    assert cost.model_catalog_ref == mock_catalog
+
+
+def test_execution_cost_custom_execution_type(test_uuid: str) -> None:
+    """Test custom execution types that are not in the predefined list."""
+    # Custom execution type should be accepted and normalized
+    cost = ExecutionCost.model_validate({
+        "agent_id": 1,
+        "model_name": f"test-model-{test_uuid[:8]}",
+        "execution_type": "  CUSTOM_WORKFLOW_TYPE  ",  # Not in predefined list
+        "input_tokens": 100,
+        "output_tokens": 50,
+        "total_cost": "0.01000"
+    })
+    
+    # Should be normalized to lowercase and stripped
+    assert cost.execution_type == "custom_workflow_type"
+
+
+def test_execution_cost_efficiency_score_without_execution_time(test_uuid: str) -> None:
+    """Test efficiency score calculation when execution_time_ms is None."""
+    cost = ExecutionCost.model_validate({
+        "agent_id": 1,
+        "model_name": f"test-model-{test_uuid[:8]}",
+        "execution_type": "task_completion",
+        "input_tokens": 1000,
+        "output_tokens": 500,
+        "total_cost": "0.05000",
+        "execution_time_ms": None  # No execution time data
+    })
+    
+    efficiency_score = cost.get_execution_efficiency_score()
+    cost_per_token = cost.get_cost_per_token()
+    
+    # Without execution time, efficiency score should equal cost per token
+    assert efficiency_score == cost_per_token
+    assert isinstance(efficiency_score, Decimal)
+
+
+def test_execution_cost_efficiency_score_with_zero_execution_time(test_uuid: str) -> None:
+    """Test efficiency score calculation when execution_time_ms is 0."""
+    cost = ExecutionCost.model_validate({
+        "agent_id": 1,
+        "model_name": f"test-model-{test_uuid[:8]}",
+        "execution_type": "task_completion",
+        "input_tokens": 1000,
+        "output_tokens": 500,
+        "total_cost": "0.05000",
+        "execution_time_ms": 0  # Zero execution time
+    })
+    
+    efficiency_score = cost.get_execution_efficiency_score()
+    cost_per_token = cost.get_cost_per_token()
+    
+    # With zero execution time, efficiency score should equal cost per token (no penalty)
+    assert efficiency_score == cost_per_token
+
+
+def test_execution_cost_whitespace_validation(test_uuid: str) -> None:
+    """Test validation of whitespace-only strings."""
+    # Whitespace-only execution type should raise error
+    with pytest.raises(ValueError, match="Execution type cannot be empty"):
+        ExecutionCost.model_validate({
+            "agent_id": 1,
+            "model_name": f"test-model-{test_uuid[:8]}",
+            "execution_type": "   ",  # Only whitespace
+            "input_tokens": 100,
+            "output_tokens": 50,
+            "total_cost": "0.01000"
+        })
+    
+    # Whitespace-only model name should raise error
+    with pytest.raises(ValueError, match="Model name cannot be empty"):
+        ExecutionCost.model_validate({
+            "agent_id": 1,
+            "model_name": "   ",  # Only whitespace
+            "execution_type": "task_completion",
+            "input_tokens": 100,
+            "output_tokens": 50,
+            "total_cost": "0.01000"
+        })
+
+
+def test_execution_cost_metadata_validator_flow(test_uuid: str) -> None:
+    """Test the complete metadata validation flow through both validators."""
+    # Test that metadata flows through both before and after validators
+    metadata = {"test_key": "test_value", "numeric_value": 42}
+    
+    cost = ExecutionCost.model_validate({
+        "agent_id": 1,
+        "model_name": f"test-model-{test_uuid[:8]}",
+        "execution_type": "task_completion",
+        "input_tokens": 100,
+        "output_tokens": 50,
+        "total_cost": "0.01000",
+        "execution_metadata": metadata
+    })
+    
+    # Metadata should be preserved through validation
+    assert cost.execution_metadata == metadata

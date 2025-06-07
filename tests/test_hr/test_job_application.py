@@ -4,7 +4,12 @@ Tests for the JobApplication model.
 
 import pytest
 from datetime import datetime
-from typing import Dict, Any
+from typing import Dict, Any, TYPE_CHECKING
+
+# Test import coverage for TYPE_CHECKING block
+if TYPE_CHECKING:
+    from api.hr.models.job_description import JobDescription
+    from api.hr.models.resume import Resume
 
 from api.hr.models.job_application import (
     JobApplication,

@@ -22,6 +22,9 @@
 
 ### Testing Approach
 - **NO standalone test scripts**: All tests must be in the `tests/` directory structure
+- **NO ad-hoc testing scripts**: Never create standalone Python scripts for testing (like `debug_validation.py`, `test_validator.py`, etc.) - all testing must be done through proper test functions in the tests directory
+- **NO manual terminal testing**: Never run manual Python commands in terminal to test behavior - write proper test functions instead
+- **NO experimental scripts in workspace root**: Do not create temporary test files, diagnostic scripts, or validation scripts in the workspace root or anywhere outside the tests directory
 - **Use `invoke` command for task execution**: Instead of direct terminal commands, use invoke tasks
 - **Run tests via pytest**: Always use `pytest` command from the proper test directory
 - **Use test functions not classes**: Prefer `def test_*()` functions over `class Test*:` classes
@@ -31,11 +34,17 @@
 - **Traceable test data**: Include `test_uuid` in descriptions and other fields so test data can be traced in logs/DB
 - **Use pytest parameterization**: Use `@pytest.mark.parametrize` for testing multiple scenarios efficiently
 - **Don't test built-ins**: Don't write tests for built-in functionality like enum values or Python core features
-- **NO manual testing in terminal**: If you need to test behavior, write a proper test function instead of running manual commands
-- **Write tests to verify actual behavior**: If tests are failing and you're unsure why, add diagnostic tests to understand the current behavior
+- **Write tests to verify actual behavior**: If tests are failing and you're unsure why, add diagnostic tests to understand the current behavior within the proper test files
 - **Don't test Pydantic basics**: Don't test that constructor parameters are assigned to model fields - test custom validators, business logic, and edge cases
 - **Use proper Pydantic methods**: Use `Model.model_validate(data)` for creating instances from dictionaries, but use direct constructor `Model(field=value)` when passing individual parameters
 - **Fix all warnings**: Address deprecation warnings, type warnings, and other warnings identified during testing
+
+### Test Coverage Requirements
+- **Target 100% branch and statement coverage**: Strive for complete code coverage to ensure all code paths are tested
+- **Use coverage reporting**: All test runs should include coverage analysis with branch coverage enabled
+- **Coverage reports**: Generate terminal output and both XML and HTML reports for detailed coverage analysis
+- **Exclude coverage gaps only when justified**: Missing coverage should be explicitly justified and documented
+- **Coverage-driven development**: Use coverage reports to identify untested code paths and write targeted tests
 
 ### TDD Implementation
 - Write failing tests first (Red)
@@ -49,6 +58,7 @@
 - **Run quality checks before completion**: Run `mypy` and `ruff` to check for type errors and code quality issues
 - **Fix all quality issues**: Address any errors, warnings, or style issues identified by static analysis tools
 - **Verify complete test coverage**: Only mark a task as complete when both `invoke test` and `invoke check` run clean without filtering (no errors across the entire codebase)
+- **Coverage verification**: Use coverage reports to ensure 100% branch and statement coverage before task completion
 - Stop after each sub-task completion and wait for user approval
 
 ### SQLModel/SQLAlchemy Patterns
