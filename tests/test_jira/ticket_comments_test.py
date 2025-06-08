@@ -1,4 +1,8 @@
 
+from fastapi.testclient import TestClient
+import pytest
+
+
 def test_create_comment(client, test_uuid):
     """Test creating a comment on a ticket."""
     # Create a board first

@@ -1,4 +1,8 @@
 
+from fastapi.testclient import TestClient
+import pytest
+
+
 def test_create_board(client, test_uuid):
     """Test creating a board."""
     response = client.post("/api/boards/", json={"name": f"Test Board {test_uuid}"})

@@ -283,7 +283,11 @@ class TestSkillMatching:
     @pytest.mark.asyncio
     async def test_calculate_skill_match_no_match(self, test_session, sample_resume_data):
         """Test skill matching with no matches."""
-        resume = await create_resume(test_session, sample_resume_data)
+        # Use a different email to avoid conflicts with other tests
+        modified_data = sample_resume_data.copy()
+        modified_data.email = f"no-match-test-{modified_data.email}"
+        
+        resume = await create_resume(test_session, modified_data)
         required_skills = ["NonExistentSkill1", "NonExistentSkill2"]
 
         match_score = await calculate_skill_match(test_session, resume.id, required_skills)
@@ -293,7 +297,11 @@ class TestSkillMatching:
     @pytest.mark.asyncio
     async def test_calculate_skill_match_empty_required(self, test_session, sample_resume_data):
         """Test skill matching with empty required skills."""
-        resume = await create_resume(test_session, sample_resume_data)
+        # Use a different email to avoid conflicts with other tests
+        modified_data = sample_resume_data.copy()
+        modified_data.email = f"empty-required-test-{modified_data.email}"
+        
+        resume = await create_resume(test_session, modified_data)
 
         match_score = await calculate_skill_match(test_session, resume.id, [])
 

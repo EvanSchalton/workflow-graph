@@ -18,6 +18,7 @@ def webhook_manager(mock_session):
     return WebhookManager(session=mock_session)
 
 
+@pytest.mark.asyncio
 async def test_get_subscribers(webhook_manager, mock_session):
     """Test retrieving webhook subscribers for an event code."""
     # Setup mock webhooks
@@ -35,6 +36,7 @@ async def test_get_subscribers(webhook_manager, mock_session):
     mock_session.execute.assert_called_once()
 
 
+@pytest.mark.asyncio
 async def test_broadcast(webhook_manager, mock_session):
     """Test broadcasting an event to subscribers."""
     # Setup mock webhooks with publish method
