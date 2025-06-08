@@ -81,24 +81,58 @@ def client() -> Generator[TestClient, None, None]:
                         def all(self):
                             return self.data
                     return MockScalars(self.data)
+                
+                def scalar_one_or_none(self):
+                    if len(self.data) > 0:
+                        return self.data[0]
+                    return None
             
             # Handle different query types
             try:
                 stmt_str = str(stmt)
                 
-                # Handle TicketComment queries with filtering
-                if 'ticketcomment' in stmt_str.lower() or 'TicketComment' in stmt_str:
+                # Log statement for debugging
+                print(f"Mock execute called with: {stmt_str}")
+                print(f"Current data store: {self._data}")
+                
+                # First check for a ticket_comments query
+                if ('ticketcomment' in stmt_str.lower() or 'ticket_comment' in stmt_str.lower() or 'TicketComment' in stmt_str) and 'WHERE' in stmt_str:
                     if 'TicketComment' in self._data:
-                        all_comments = list(self._data['TicketComment'].values())
-                        
-                        # Check if this is a filtered query (e.g., by ticket_id)
-                        if 'WHERE' in stmt_str and 'ticket_id' in stmt_str:
-                            # Try to extract ticket_id from the query
-                            # For now, return all comments for the ticket since our test creates them for the same ticket
-                            return MockResult(all_comments)
-                        else:
-                            # Return all comments
-                            return MockResult(all_comments)
+                        comments = list(self._data['TicketComment'].values())
+                        print(f"Special case: Returning ticket comments: {comments}")
+                        return MockResult(comments)
+                
+                # Handle general ticket queries
+                if ('Ticket' in stmt_str or 'ticket' in stmt_str.lower()) and not ('TicketComment' in stmt_str or 'ticketcomment' in stmt_str.lower()):
+                    # Return all tickets in the data store
+                    if 'Ticket' in self._data:
+                        ticket_values = list(self._data['Ticket'].values())
+                        print(f"Returning tickets: {ticket_values}")
+                        return MockResult(ticket_values)
+                
+                elif 'TicketComment' in stmt_str or 'ticketcomment' in stmt_str.lower() or 'ticket_comment' in stmt_str.lower():
+                    # Return ticket comments
+                    if 'TicketComment' in self._data:
+                        comments = list(self._data['TicketComment'].values())
+                        print(f"Returning TicketComment objects: {comments}")
+                        return MockResult(comments)
+
+                elif 'StatusColumn' in stmt_str or 'status_column' in stmt_str.lower():
+                    # Return all columns in the data store
+                    if 'StatusColumn' in self._data:
+                        column_values = list(self._data['StatusColumn'].values())
+                        print(f"Returning columns: {column_values}")
+                        return MockResult(column_values)
+                
+                elif 'Board' in stmt_str or 'board' in stmt_str.lower():
+                    # Return all boards in the data store
+                    if 'Board' in self._data:
+                        # Log what we're returning
+                        board_values = list(self._data['Board'].values())
+                        print(f"Returning boards: {board_values}")
+                        return MockResult(board_values)
+                
+                # This code is now handled in the earlier conditions
                 
                 # Handle other table queries 
                 elif hasattr(stmt, 'table') and hasattr(stmt.table, 'name'):
@@ -114,7 +148,9 @@ def client() -> Generator[TestClient, None, None]:
                     if table_name in model_name_map:
                         model_name = model_name_map[table_name]
                         if model_name in self._data:
-                            return MockResult(list(self._data[model_name].values()))
+                            values = list(self._data[model_name].values())
+                            print(f"Returning {model_name} values: {values}")
+                            return MockResult(values)
                 
             except Exception as e:
                 print(f"Error in mock execute: {e}")

@@ -67,6 +67,10 @@
 - **Virtual environment**: Poetry automatically manages the virtual environment; use `poetry shell` or `poetry run <command>` to execute commands in the environment
 
 ### Test Directory Structure
+- **Tests mirror application code structure**: The test directory structure should mirror the application code directory structure, including file organization
+  - Each application code file should have a corresponding test file in the same relative path in the tests directory
+  - For example, if there's a file at `api/hr/resume.py`, there should be a corresponding test file at `tests/test_hr/resume_test.py`
+  - All tests for a given function or class should be in one test file that has the same relative path as the application code
 - **NO `__init__.py` files in tests directory**: Pytest discovery works better without them and avoids import conflicts
 - Test directories must start with `test_` (e.g., `test_hr/`, `test_jira/`)
 - All test files must end with `_test.py` (e.g., `resume_crud_test.py`, not `test_resume_crud.py`)
