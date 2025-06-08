@@ -11,6 +11,45 @@
 - **One function or class per file for business logic**: Each business logic function or DAO function should be in its own file named after that function. Exception: API routes, CLI commands, and orchestration files may contain multiple functions that handle parameter marshalling, dependency injection, and delegation to business logic functions
 - **SQL in separate files**: SQL queries should be stored in separate *.sql files in a 'sql' directory (one sql directory per service) and loaded using pathlib.Path
 
+### SOLID Principles Implementation
+- **Single Responsibility Principle (SRP)**: Each function, class, module, and service should have one reason to change
+  - Functions: Each business logic function handles one specific operation (e.g., `create_user.py`, `validate_email.py`)
+  - Classes: Each model class represents one entity; each service class handles one domain
+  - Services: Each microservice handles one bounded context (HR, Cost Tracking, Orchestration, etc.)
+- **Open/Closed Principle (OCP)**: Code should be open for extension but closed for modification
+  - Use dependency injection patterns for extensibility
+  - Implement plugin architectures for consensus algorithms and agent intelligence
+  - Use composition over inheritance for extending functionality
+- **Liskov Substitution Principle (LSP)**: Derived classes must be substitutable for their base classes
+  - All implementations of an interface must honor the contract
+  - Abstract base classes should define clear behavioral contracts
+  - Service implementations should be interchangeable through interface contracts
+- **Interface Segregation Principle (ISP)**: Clients should not be forced to depend on interfaces they don't use
+  - Create focused, client-specific interfaces rather than monolithic ones
+  - Split large service interfaces into smaller, cohesive contracts
+  - Services should expose only the operations their clients need (e.g., HR service shouldn't expose orchestration methods)
+  - Data pipelines should have distinct interfaces for different stages (ingestion, processing, output)
+- **Dependency Inversion Principle (DIP)**: Depend on abstractions, not concretions
+  - High-level modules should not depend on low-level modules; both should depend on abstractions
+  - Use dependency injection for database sessions, external services, and configuration
+  - Services should depend on interface contracts, not concrete implementations
+  - Abstract data access behind repository interfaces
+
+### Service Architecture Principles
+- **Services as Classes**: Each microservice should follow the same SOLID principles as individual classes
+  - **Service SRP**: Each service handles one bounded context with a single responsibility
+  - **Service OCP**: Services should be extensible through configuration and plugin patterns without modification
+  - **Service LSP**: Different implementations of a service interface should be interchangeable
+  - **Service ISP**: Services should expose focused APIs tailored to specific client needs
+  - **Service DIP**: Services should depend on abstract contracts, not concrete service implementations
+- **Interface Segregation Between Services**: 
+  - Design focused service contracts rather than monolithic APIs
+  - Separate read and write operations into different interfaces when appropriate
+  - Create client-specific service facades that expose only needed operations
+  - Data pipelines should have distinct service interfaces for each processing stage
+- **Loose Coupling**: Services should communicate through well-defined interfaces and message contracts
+- **High Cohesion**: Related functionality should be grouped within the same service boundary
+
 ### Code Organization Patterns
 - **Business Logic Functions**: Each business logic function should be in its own file (e.g., `create_user.py`, `validate_email.py`)
 - **DAO Functions**: Database access functions should be segmented per file (e.g., `get_user_by_id.py`, `update_user_status.py`)
@@ -29,7 +68,9 @@
 
 ### Test Directory Structure
 - **NO `__init__.py` files in tests directory**: Pytest discovery works better without them and avoids import conflicts
-- Follow structure: `tests/test_module/test_submodule/test_file.py`
+- Test directories must start with `test_` (e.g., `test_hr/`, `test_jira/`)
+- All test files must end with `_test.py` (e.g., `resume_crud_test.py`, not `test_resume_crud.py`)
+- Follow structure: `tests/test_module/test_submodule/file_test.py`
 
 ### Testing Approach
 - **NO standalone test scripts**: All tests must be in the `tests/` directory structure

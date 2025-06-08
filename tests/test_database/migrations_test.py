@@ -10,8 +10,9 @@ import sys
 from pathlib import Path
 import pytest
 
-# Add the parent directory to the path so we can import the migration module
-sys.path.insert(0, str(Path(__file__).parent))
+# Add the database directory to the path so we can import the migration modules
+database_dir = Path(__file__).parent.parent.parent / "database"
+sys.path.insert(0, str(database_dir))
 
 # Import individual function modules
 from create_migration_table import create_migration_table
