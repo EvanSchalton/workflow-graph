@@ -74,7 +74,7 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     await engine.dispose()
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid() -> str:
     """Generate a unique ID for test traceability."""
     return str(uuid.uuid4())

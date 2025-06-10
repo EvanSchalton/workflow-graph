@@ -15,7 +15,7 @@ sys.path.insert(0, str(workspace_root))
 from api.jira.main import app  # noqa: E402
 from api.jira.routes.dependencies.get_session import get_session  # noqa: E402
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid():
     """Generate a unique UUID for testing."""
     return str(uuid4())

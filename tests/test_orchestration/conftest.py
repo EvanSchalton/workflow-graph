@@ -7,7 +7,7 @@ from uuid import uuid4
 from decimal import Decimal
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid() -> str:
     """Generate a unique test UUID for traceability."""
     return str(uuid4())

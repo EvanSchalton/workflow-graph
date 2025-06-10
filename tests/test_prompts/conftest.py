@@ -6,7 +6,7 @@ import pytest
 import uuid
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid() -> str:
     """Generate a unique UUID for test traceability."""
     return str(uuid.uuid4())

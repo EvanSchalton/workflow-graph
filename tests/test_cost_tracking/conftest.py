@@ -15,7 +15,7 @@ if str(workspace_root) not in sys.path:
     sys.path.insert(0, str(workspace_root))
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid() -> str:
     """Generate a unique UUID for testing."""
     return str(uuid4())

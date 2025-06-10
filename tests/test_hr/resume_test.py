@@ -40,13 +40,17 @@ def sample_education_entry(test_uuid: str) -> Dict[str, Any]:
     }
 
 
-@pytest.fixture
-def sample_resume_data(test_uuid: str, sample_experience_entry: Dict[str, Any], sample_education_entry: Dict[str, Any]) -> Dict[str, Any]:
+@pytest.fixture(scope="function")
+def sample_resume_data(
+    test_uuid: str,
+    sample_experience_entry: Dict[str, Any],
+    sample_education_entry: Dict[str, Any]
+) -> Dict[str, Any]:
     """Create sample resume data for testing."""
     return {
-        "name": f"John Doe {test_uuid[:8]}",
-        "email": f"john.doe.{test_uuid[:8]}@example.com",
-        "phone": "+1-555-123-4567",
+        "name": f"John Doe {test_uuid}",
+        "email": f"john.doe.{test_uuid}@example.com",
+        "phone": f"+1-555-123-4567",
         "summary": f"Experienced software engineer {test_uuid}",
         "skills": ["Python", "FastAPI", "SQLAlchemy"],
         "experience": [sample_experience_entry],

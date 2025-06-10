@@ -20,7 +20,7 @@ import os
 DATABASE_URL = os.environ.get("TEST_DATABASE_URL", "postgresql+asyncpg://jira:jira@docker.lan:5432/postgres")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def test_uuid() -> str:
     """Generate a unique UUID for testing."""
     return str(uuid4())
@@ -44,29 +44,38 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
                 connect_args={"timeout": 3}  # Connection timeout in seconds
             )
             
-            # Create tables in the test schema
+            # Create tables in the test schema and clean up BEFORE creating session
             async with engine.begin() as conn:
                 await conn.execute(text('CREATE SCHEMA IF NOT EXISTS test'))
                 await conn.execute(text('SET search_path TO test'))
                 # Drop and recreate tables to ensure schema changes are applied
+                await conn.execute(text('DROP TABLE IF EXISTS job_applications CASCADE'))
+                await conn.execute(text('DROP TABLE IF EXISTS agents CASCADE'))
                 await conn.execute(text('DROP TABLE IF EXISTS resumes CASCADE'))
                 # Create tables from the current models
                 await conn.run_sync(SQLModel.metadata.create_all)
             
-            # Create session
-            async_session = async_sessionmaker(
+            # Create session factory
+            async_session_factory = async_sessionmaker(
                 engine, expire_on_commit=False
             )
             
-            async with async_session() as session:
+            # Create a new session for this test
+            async with async_session_factory() as session:
                 # Set search path for this session
                 await session.execute(text('SET search_path TO test'))
-                yield session
-            
-            # Clean up: just truncate tables instead of dropping the schema
-            async with engine.begin() as conn:
-                await conn.execute(text('SET search_path TO test'))
-                await conn.execute(text('TRUNCATE TABLE resumes CASCADE'))
+                
+                try:
+                    yield session
+                finally:
+                    # Ensure cleanup happens even if test fails
+                    try:
+                        await session.rollback()  # Rollback any uncommitted transactions
+                        # Clean up: truncate tables to ensure clean state for next test
+                        await session.execute(text('TRUNCATE TABLE resumes CASCADE'))
+                        await session.commit()
+                    except Exception as cleanup_error:
+                        print(f"Warning: Cleanup failed: {cleanup_error}")
             
             await engine.dispose()
     
@@ -84,28 +93,33 @@ async def test_session() -> AsyncGenerator[AsyncSession, None]:
         yield mock_session
 
 
-@pytest.fixture
-def sample_resume_data():
+@pytest.fixture(scope="function")
+def sample_resume_data(test_uuid: str):
     """Provide sample resume data for testing."""
     from api.hr.models.resume import ResumeCreate
+    import time
+    
+    # Use timestamp + uuid for extra uniqueness to prevent conflicts
+    timestamp = str(int(time.time() * 1000))  # milliseconds since epoch
+    unique_id = f"{test_uuid[:8]}-{timestamp[-6:]}"  # combine uuid and timestamp
     
     return ResumeCreate(
-        name="John Doe",
-        email="john.doe@example.com",
-        phone="+1-555-0100",
+        name=f"John Doe {unique_id}",
+        email=f"test-{unique_id}@example.com",
+        phone=f"+1-555-0100",
         skills=["Python", "JavaScript", "SQL"],
         experience=[
             {
-                "company": "Tech Corp",
+                "company": f"Tech Corp {unique_id}",
                 "position": "Software Developer",
                 "start_date": "2022-01-01",
                 "end_date": "2023-12-31",
-                "description": "Developed web applications"
+                "description": f"Developed web applications - Test ID: {test_uuid}"
             }
         ],
         education=[
             {
-                "institution": "University of Technology",
+                "institution": f"University of Technology {unique_id}",
                 "degree": "Bachelor of Science",
                 "field": "Computer Science",
                 "graduation_year": 2021

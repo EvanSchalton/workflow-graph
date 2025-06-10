@@ -88,7 +88,7 @@ async def create_resume(
             {"email": email}
         )
         if existing_check.first():
-            raise ValueError(f"email already exists")
+            raise ValueError(f"'{email}' email already exists")
         
         # Convert dict to ResumeCreate if needed
         if isinstance(resume_data, dict):

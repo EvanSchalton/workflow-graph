@@ -54,7 +54,7 @@ async def update_resume(
                 {"email": email, "resume_id": resume_id}
             )
             if email_check.first():
-                raise ValueError(f"email already exists")
+                raise ValueError("'{email}' email already exists")
         
         # Build update query dynamically based on provided fields
         update_fields = []
