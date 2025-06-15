@@ -4,6 +4,7 @@ Unit tests for TaskPrompt model.
 
 import pytest
 from datetime import datetime
+from typing import Any
 from pydantic import ValidationError
 
 from api.prompts.models.task_prompt import TaskPrompt
@@ -113,7 +114,7 @@ def test_task_prompt_invalid_template(task_prompt_data: dict, invalid_template: 
     [123],
     "not_a_list"
 ])
-def test_task_prompt_invalid_variables(task_prompt_data: dict, invalid_variables) -> None:
+def test_task_prompt_invalid_variables(task_prompt_data: dict, invalid_variables: Any) -> None:
     """Test TaskPrompt validation with invalid variable names."""
     task_prompt_data["variables"] = invalid_variables
     

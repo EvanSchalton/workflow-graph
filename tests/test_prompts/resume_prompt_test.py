@@ -4,6 +4,7 @@ Unit tests for ResumePrompt model.
 
 import pytest
 from datetime import datetime
+from typing import Any
 from pydantic import ValidationError
 
 from api.prompts.models.resume_prompt import ResumePrompt, PersonaType
@@ -113,7 +114,7 @@ def test_resume_prompt_invalid_template(resume_prompt_data: dict, invalid_templa
     [123],
     "not_a_list"
 ])
-def test_resume_prompt_invalid_variables(resume_prompt_data: dict, invalid_variables) -> None:
+def test_resume_prompt_invalid_variables(resume_prompt_data: dict, invalid_variables: Any) -> None:
     """Test ResumePrompt validation with invalid variable names."""
     resume_prompt_data["variables"] = invalid_variables
     

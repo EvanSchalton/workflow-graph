@@ -1,6 +1,7 @@
 
 from fastapi.testclient import TestClient
 import pytest
+from tests.utils import get_unique_test_id
 
 
 def test_create_comment(client, test_uuid):
@@ -161,7 +162,7 @@ def test_comment_not_found(client, test_uuid):
     ticket_response = client.post("/api/tickets/", json={"title": "Test Ticket", "description": f"Test Description {test_uuid}", "column_id": column_id})
     ticket_id = ticket_response.json()["id"]
 
-    non_existent_id = 99999
+    non_existent_id = get_unique_test_id()
 
     # Try to get non-existent comment
     get_response = client.get(f"/api/tickets/{ticket_id}/comments/{non_existent_id}")

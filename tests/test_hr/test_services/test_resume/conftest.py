@@ -29,68 +29,55 @@ def test_uuid() -> str:
 @pytest_asyncio.fixture
 async def test_session() -> AsyncGenerator[AsyncSession, None]:
     """Create a test database session using the existing PostgreSQL test schema."""
-    import asyncio
-    from unittest.mock import AsyncMock, MagicMock
+    # Use PostgreSQL without specifying schema in URL
+    engine = create_async_engine(
+        DATABASE_URL,
+        echo=False,  # Reduce noise in test output
+        future=True,
+        poolclass=NullPool,
+        connect_args={"timeout": 30}  # Increased timeout for reliability
+    )
     
     try:
-        # Use timeout to prevent hanging if database is not reachable
-        async with asyncio.timeout(3.0):
-            # Use PostgreSQL without specifying schema in URL
-            engine = create_async_engine(
-                DATABASE_URL,
-                echo=True,
-                future=True,
-                poolclass=NullPool,
-                connect_args={"timeout": 3}  # Connection timeout in seconds
-            )
+        # Create tables in the test schema and clean up BEFORE creating session
+        async with engine.begin() as conn:
+            await conn.execute(text('CREATE SCHEMA IF NOT EXISTS test'))
+            await conn.execute(text('SET search_path TO test'))
+            # Drop and recreate tables to ensure clean state
+            await conn.execute(text('DROP TABLE IF EXISTS job_applications CASCADE'))
+            await conn.execute(text('DROP TABLE IF EXISTS agents CASCADE')) 
+            await conn.execute(text('DROP TABLE IF EXISTS resumes CASCADE'))
+            # Create tables from the current models
+            await conn.run_sync(SQLModel.metadata.create_all)
+        
+        # Create session factory
+        async_session_factory = async_sessionmaker(
+            engine, expire_on_commit=False
+        )
+        
+        # Create a new session for this test
+        async with async_session_factory() as session:
+            # Set search path for this session
+            await session.execute(text('SET search_path TO test'))
             
-            # Create tables in the test schema and clean up BEFORE creating session
-            async with engine.begin() as conn:
-                await conn.execute(text('CREATE SCHEMA IF NOT EXISTS test'))
-                await conn.execute(text('SET search_path TO test'))
-                # Drop and recreate tables to ensure schema changes are applied
-                await conn.execute(text('DROP TABLE IF EXISTS job_applications CASCADE'))
-                await conn.execute(text('DROP TABLE IF EXISTS agents CASCADE'))
-                await conn.execute(text('DROP TABLE IF EXISTS resumes CASCADE'))
-                # Create tables from the current models
-                await conn.run_sync(SQLModel.metadata.create_all)
-            
-            # Create session factory
-            async_session_factory = async_sessionmaker(
-                engine, expire_on_commit=False
-            )
-            
-            # Create a new session for this test
-            async with async_session_factory() as session:
-                # Set search path for this session
-                await session.execute(text('SET search_path TO test'))
-                
+            try:
+                yield session
+            finally:
+                # Ensure cleanup happens even if test fails
                 try:
-                    yield session
-                finally:
-                    # Ensure cleanup happens even if test fails
+                    await session.rollback()  # Rollback any uncommitted transactions
+                    # Clean up: truncate tables to ensure clean state for next test
+                    await session.execute(text('TRUNCATE TABLE resumes CASCADE'))
+                    await session.commit()
+                except Exception as cleanup_error:
+                    print(f"Warning: Cleanup failed: {cleanup_error}")
+                    # If cleanup fails, try to rollback to prevent hanging transactions
                     try:
-                        await session.rollback()  # Rollback any uncommitted transactions
-                        # Clean up: truncate tables to ensure clean state for next test
-                        await session.execute(text('TRUNCATE TABLE resumes CASCADE'))
-                        await session.commit()
-                    except Exception as cleanup_error:
-                        print(f"Warning: Cleanup failed: {cleanup_error}")
-            
-            await engine.dispose()
-    
-    except (asyncio.TimeoutError, Exception) as e:
-        print(f"Database connection failed: {e}. Using mock session instead.")
-        # Create a mock session that allows tests to run without a database
-        mock_session = AsyncMock(spec=AsyncSession)
-        
-        # Set up mock query responses
-        mock_result = MagicMock()
-        mock_result.scalars.return_value.first.return_value = None
-        mock_session.execute.return_value = mock_result
-        
-        # Allow test to run against mock
-        yield mock_session
+                        await session.rollback()
+                    except:
+                        pass
+    finally:
+        await engine.dispose()
 
 
 @pytest.fixture(scope="function")

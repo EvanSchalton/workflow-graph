@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 import pytest
+from tests.utils import get_unique_test_id
 
 
 def test_delete_board_with_events(client, test_uuid):
@@ -23,7 +24,7 @@ def test_delete_board_with_events(client, test_uuid):
 def test_delete_nonexistent_board(client):
     """Test deleting a board that doesn't exist."""
     # Use a board ID that is unlikely to exist
-    nonexistent_id = 99999
+    nonexistent_id = get_unique_test_id()
     
     response = client.delete(f"/api/boards/{nonexistent_id}")
     

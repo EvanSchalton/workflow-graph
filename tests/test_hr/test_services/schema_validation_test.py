@@ -4,6 +4,7 @@ Test to validate schema definitions match between SQLAlchemy models and the Post
 
 import pytest
 import pytest_asyncio
+from typing import List, Dict, Any, AsyncGenerator
 from sqlalchemy import inspect
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.pool import NullPool
@@ -13,7 +14,7 @@ DATABASE_URL = "postgresql+asyncpg://jira:jira@docker.lan:5432/postgres"
 
 
 @pytest_asyncio.fixture
-async def db_connection():
+async def db_connection() -> AsyncGenerator[AsyncSession, None]:
     """Create a test database connection."""
     engine = create_async_engine(
         DATABASE_URL,
@@ -33,10 +34,10 @@ async def db_connection():
 
 
 @pytest.mark.asyncio
-async def test_job_description_schema(db_connection: AsyncSession):
+async def test_job_description_schema(db_connection: AsyncSession) -> None:
     """Verify that the job_description table schema in PostgreSQL matches our model definition."""
     # Get the inspector using the connection from the session
-    def get_inspector_and_columns(sync_session):
+    def get_inspector_and_columns(sync_session: Any) -> List[Dict[str, Any]]:
         # Get the connection from the session
         connection = sync_session.connection()
         inspector = inspect(connection)

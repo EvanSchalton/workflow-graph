@@ -40,9 +40,10 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     # Use PostgreSQL without specifying schema in URL
     engine = create_async_engine(
         DATABASE_URL,
-        echo=True,
+        echo=False,  # Reduce noise in test output
         future=True,
         poolclass=NullPool,
+        connect_args={"timeout": 10}  # Add timeout for reliability
     )
     
     # Create tables in the test schema
@@ -64,12 +65,21 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     async with async_session() as session:
         # Set search path for this session
         await session.execute(text('SET search_path TO test'))
-        yield session
-    
-    # Clean up: just truncate tables instead of dropping the schema
-    async with engine.begin() as conn:
-        await conn.execute(text('SET search_path TO test'))
-        await conn.execute(text('TRUNCATE TABLE job_descriptions CASCADE'))
+        
+        try:
+            yield session
+        finally:
+            # Clean up within the same session context to avoid connection issues
+            try:
+                await session.rollback()  # Rollback any uncommitted transactions
+                await session.execute(text('TRUNCATE TABLE job_descriptions CASCADE'))
+                await session.commit()
+            except Exception as cleanup_error:
+                print(f"Warning: Cleanup failed: {cleanup_error}")
+                try:
+                    await session.rollback()
+                except:
+                    pass
     
     await engine.dispose()
 

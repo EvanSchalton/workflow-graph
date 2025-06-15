@@ -1,6 +1,7 @@
 """Tests for the Board API endpoints."""
 import pytest
 from fastapi.testclient import TestClient
+from tests.utils import get_unique_test_id
 
 
 def test_create_board(client, test_uuid):
@@ -18,6 +19,30 @@ def test_create_board(client, test_uuid):
     get_response = client.get(f"/api/boards/{board_id}")
     assert get_response.status_code == 200
     assert get_response.json()["id"] == board_id
+
+
+def test_create_board_invalid_data(client):
+    """Test creating a board with invalid data."""
+    # Try to create a board with missing required data
+    response = client.post("/api/boards/", json={})
+    
+    # Verify error response
+    assert response.status_code == 422  # Unprocessable Entity
+
+
+def test_create_board_with_id(client, test_uuid):
+    """Test creating a board with a specific ID."""
+    # Creating a board with an ID should work, but the ID might be ignored
+    # as the server typically assigns its own IDs
+    unique_id = get_unique_test_id()
+    board_data = {"name": f"Board with ID {test_uuid}", "id": unique_id}
+    response = client.post("/api/boards/", json=board_data)
+    
+    assert response.status_code == 200
+    board = response.json()
+    assert board["name"] == f"Board with ID {test_uuid}"
+    # The ID might not match what we provided as the server may assign its own ID
+    assert "id" in board
 
 
 def test_get_boards(client, test_uuid):
@@ -68,6 +93,17 @@ def test_get_board_by_id(client, test_uuid):
     assert board["name"] == f"Test Board {test_uuid}"
 
 
+def test_get_board_by_id_not_found(client):
+    """Test retrieving a non-existent board by ID."""
+    # Use a board ID that is unlikely to exist
+    nonexistent_id = get_unique_test_id()
+    response = client.get(f"/api/boards/{nonexistent_id}")
+    
+    # Verify error response
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
+
+
 def test_update_board(client, test_uuid):
     """Test updating a board."""
     # Create a board first
@@ -91,6 +127,19 @@ def test_update_board(client, test_uuid):
     assert get_response.status_code == 200
     retrieved_board = get_response.json()
     assert retrieved_board["name"] == updated_name
+
+
+def test_update_nonexistent_board(client, test_uuid):
+    """Test updating a board that doesn't exist."""
+    # Use a board ID that is unlikely to exist
+    nonexistent_id = get_unique_test_id()
+    updated_data = {"name": f"Updated Nonexistent {test_uuid}"}
+    
+    response = client.put(f"/api/boards/{nonexistent_id}", json=updated_data)
+    
+    # Verify error response
+    assert response.status_code == 404
+    assert "not found" in response.json()["detail"].lower()
 
 
 def test_delete_board(client, test_uuid):

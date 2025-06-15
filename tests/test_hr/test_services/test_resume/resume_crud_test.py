@@ -3,6 +3,9 @@ Comprehensive tests for resume CRUD operations.
 """
 from uuid import UUID
 import pytest
+from typing import Dict, Any
+from sqlmodel.ext.asyncio.session import AsyncSession
+from tests.utils import get_unique_test_id
 from api.hr.models.resume import Resume, ResumeCreate
 from api.hr.services.resume import (
     create_resume,
@@ -16,7 +19,7 @@ from api.hr.services.resume import (
 # Resume Creation Tests
 
 @pytest.mark.asyncio
-async def test_create_resume_success(test_session, sample_resume_data):
+async def test_create_resume_success(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test successful resume creation."""
     resume = await create_resume(test_session, sample_resume_data)
 
@@ -110,7 +113,7 @@ async def test_get_resume_success(test_session, sample_resume_data):
 @pytest.mark.asyncio
 async def test_get_resume_not_found(test_session):
     """Test that get_resume returns None for non-existent ID."""
-    non_existent_id = 99999
+    non_existent_id = get_unique_test_id()
     resume = await get_resume(test_session, non_existent_id)
     assert resume is None
 
@@ -175,10 +178,11 @@ async def test_update_resume_not_found(test_session, test_uuid: str):
 
 
 @pytest.mark.asyncio
-async def test_update_resume_duplicate_email(test_session, sample_resume_data, test_uuid: str):
+async def test_update_resume_duplicate_email(test_session: AsyncSession, sample_resume_data: ResumeCreate, test_uuid: str) -> None:
     """Test that updating to existing email raises ValueError."""
     # Create first resume
     first_resume = await create_resume(test_session, sample_resume_data)
+    assert first_resume.id is not None, "First resume should have an ID after creation"
     
     # Create second resume with different email
     second_data = ResumeCreate(
@@ -190,6 +194,7 @@ async def test_update_resume_duplicate_email(test_session, sample_resume_data, t
         education=[]
     )
     second_resume = await create_resume(test_session, second_data)
+    assert second_resume.id is not None, "Second resume should have an ID after creation"
     
     # Try to update second resume to use first resume's email
     with pytest.raises(ValueError, match=".*email already exists"):
@@ -215,6 +220,6 @@ async def test_delete_resume_success(test_session, sample_resume_data):
 @pytest.mark.asyncio
 async def test_delete_resume_not_found(test_session):
     """Test delete with non-existent resume ID."""
-    non_existent_id = 99999
+    non_existent_id = get_unique_test_id()
     success = await delete_resume(test_session, non_existent_id)
     assert success is False

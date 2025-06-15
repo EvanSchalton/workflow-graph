@@ -282,7 +282,7 @@ def test_resume_string_representation(sample_resume_data: Dict[str, Any]) -> Non
 
 # Additional tests for missing validator error paths and edge cases
 
-def test_resume_skills_validator_invalid_json_string():
+def test_resume_skills_validator_invalid_json_string() -> None:
     """Test skills validator with invalid JSON string."""
     from pydantic import ValidationError
     # These tests expect ValidationError because Pydantic's schema validation
@@ -295,7 +295,7 @@ def test_resume_skills_validator_invalid_json_string():
         })
 
 
-def test_resume_skills_validator_json_decode_error():
+def test_resume_skills_validator_json_decode_error() -> None:
     """Test skills validator with JSON decode error."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -306,7 +306,7 @@ def test_resume_skills_validator_json_decode_error():
         })
 
 
-def test_resume_skills_validator_non_list_type():
+def test_resume_skills_validator_non_list_type() -> None:
     """Test skills validator with non-list type."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -317,7 +317,7 @@ def test_resume_skills_validator_non_list_type():
         })
 
 
-def test_resume_experience_validator_invalid_json_string():
+def test_resume_experience_validator_invalid_json_string() -> None:
     """Test experience validator with invalid JSON string."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -328,7 +328,7 @@ def test_resume_experience_validator_invalid_json_string():
         })
 
 
-def test_resume_experience_validator_json_decode_error():
+def test_resume_experience_validator_json_decode_error() -> None:
     """Test experience validator with JSON decode error."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -339,7 +339,7 @@ def test_resume_experience_validator_json_decode_error():
         })
 
 
-def test_resume_experience_validator_non_list_type():
+def test_resume_experience_validator_non_list_type() -> None:
     """Test experience validator with non-list type."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -350,7 +350,7 @@ def test_resume_experience_validator_non_list_type():
         })
 
 
-def test_resume_education_validator_invalid_json_string():
+def test_resume_education_validator_invalid_json_string() -> None:
     """Test education validator with invalid JSON string."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -361,7 +361,7 @@ def test_resume_education_validator_invalid_json_string():
         })
 
 
-def test_resume_education_validator_json_decode_error():
+def test_resume_education_validator_json_decode_error() -> None:
     """Test education validator with JSON decode error."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -372,7 +372,7 @@ def test_resume_education_validator_json_decode_error():
         })
 
 
-def test_resume_education_validator_non_list_type():
+def test_resume_education_validator_non_list_type() -> None:
     """Test education validator with non-list type."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -383,7 +383,7 @@ def test_resume_education_validator_non_list_type():
         })
 
 
-def test_resume_performance_history_validator_invalid_json_string():
+def test_resume_performance_history_validator_invalid_json_string() -> None:
     """Test performance_history validator with invalid JSON string."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -394,7 +394,7 @@ def test_resume_performance_history_validator_invalid_json_string():
         })
 
 
-def test_resume_performance_history_validator_json_decode_error():
+def test_resume_performance_history_validator_json_decode_error() -> None:
     """Test performance_history validator with JSON decode error."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -405,7 +405,7 @@ def test_resume_performance_history_validator_json_decode_error():
         })
 
 
-def test_resume_performance_history_validator_non_dict_type():
+def test_resume_performance_history_validator_non_dict_type() -> None:
     """Test performance_history validator with non-dictionary type."""
     from pydantic import ValidationError
     with pytest.raises(ValidationError):
@@ -416,7 +416,7 @@ def test_resume_performance_history_validator_non_dict_type():
         })
 
 
-def test_resume_json_fields_with_valid_json_strings():
+def test_resume_json_fields_with_valid_json_strings() -> None:
     """Test JSON field validators with valid JSON strings."""
     from pydantic import ValidationError
     # These tests expect ValidationError because Pydantic's schema validation 
@@ -432,7 +432,7 @@ def test_resume_json_fields_with_valid_json_strings():
         })
 
 
-def test_resume_remove_skill_not_found():
+def test_resume_remove_skill_not_found() -> None:
     """Test remove_skill method when skill is not found."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -446,7 +446,7 @@ def test_resume_remove_skill_not_found():
     assert len(resume.skills) == 2  # Skills list unchanged
 
 
-def test_resume_calculate_experience_years_invalid_entries():
+def test_resume_calculate_experience_years_invalid_entries() -> None:
     """Test calculate_experience_years with invalid experience entries."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -463,7 +463,7 @@ def test_resume_calculate_experience_years_invalid_entries():
     assert years >= 0  # Should not crash and return reasonable value
 
 
-def test_resume_calculate_experience_years_key_error():
+def test_resume_calculate_experience_years_key_error() -> None:
     """Test calculate_experience_years with missing required keys."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -479,7 +479,7 @@ def test_resume_calculate_experience_years_key_error():
     assert years >= 0
 
 
-def test_resume_skill_match_score_empty_resume_skills():
+def test_resume_skill_match_score_empty_resume_skills() -> None:
     """Test skill_match_score with empty resume skills."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -492,7 +492,7 @@ def test_resume_skill_match_score_empty_resume_skills():
     assert score == 0.0
 
 
-def test_resume_skill_match_score_empty_required_skills():
+def test_resume_skill_match_score_empty_required_skills() -> None:
     """Test skill_match_score with empty required skills."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -505,7 +505,7 @@ def test_resume_skill_match_score_empty_required_skills():
     assert score == 1.0
 
 
-def test_resume_skill_match_score_case_insensitive():
+def test_resume_skill_match_score_case_insensitive() -> None:
     """Test skill_match_score case insensitive matching."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -518,7 +518,7 @@ def test_resume_skill_match_score_case_insensitive():
     assert score == 2.0 / 3.0  # 2 matches out of 3 required
 
 
-def test_resume_calculate_experience_years_type_error():
+def test_resume_calculate_experience_years_type_error() -> None:
     """Test calculate_experience_years with TypeError in date parsing."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -534,7 +534,7 @@ def test_resume_calculate_experience_years_type_error():
     assert years >= 0
 
 
-def test_resume_validators_with_valid_json_objects():
+def test_resume_validators_with_valid_json_objects() -> None:
     """Test all validators accept valid dictionary objects directly."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -553,7 +553,7 @@ def test_resume_validators_with_valid_json_objects():
 
 # Additional tests to improve coverage of missing lines
 
-def test_resume_imports_coverage():
+def test_resume_imports_coverage() -> None:
     """Test to ensure import statements are covered."""
     from api.hr.models.resume import ExperienceEntry, EducationEntry, Resume
     from api.hr.models.resume import ResumeCreate, ResumeUpdate, ResumeRead
@@ -567,7 +567,7 @@ def test_resume_imports_coverage():
     assert ResumeRead is not None
 
 
-def test_resume_skills_validator_with_json_string_direct():
+def test_resume_skills_validator_with_json_string_direct() -> None:
     """Test skills validator directly with JSON string to trigger error paths."""
     from api.hr.models.resume import Resume
     
@@ -592,7 +592,7 @@ def test_resume_skills_validator_with_json_string_direct():
         pass
 
 
-def test_resume_experience_validator_with_json_string_direct():
+def test_resume_experience_validator_with_json_string_direct() -> None:
     """Test experience validator directly with JSON string to trigger error paths."""
     from api.hr.models.resume import Resume
     
@@ -614,7 +614,7 @@ def test_resume_experience_validator_with_json_string_direct():
         pass
 
 
-def test_resume_education_validator_with_json_string_direct():
+def test_resume_education_validator_with_json_string_direct() -> None:
     """Test education validator directly with JSON string to trigger error paths."""
     from api.hr.models.resume import Resume
     
@@ -635,7 +635,7 @@ def test_resume_education_validator_with_json_string_direct():
         pass
 
 
-def test_resume_performance_history_validator_with_json_string_direct():
+def test_resume_performance_history_validator_with_json_string_direct() -> None:
     """Test performance_history validator directly with JSON string to trigger error paths."""
     from api.hr.models.resume import Resume
     
@@ -657,7 +657,7 @@ def test_resume_performance_history_validator_with_json_string_direct():
         pass
 
 
-def test_resume_field_validators_non_dict_and_non_list_types():
+def test_resume_field_validators_non_dict_and_non_list_types() -> None:
     """Test field validators with non-dict and non-list types to trigger error paths."""
     from api.hr.models.resume import Resume
     
@@ -698,7 +698,7 @@ def test_resume_field_validators_non_dict_and_non_list_types():
         pass
 
 
-def test_resume_calculate_experience_years_negative_days():
+def test_resume_calculate_experience_years_negative_days() -> None:
     """Test calculate_experience_years with dates that could result in negative days."""
     # Test line 220 - the max(0, days) logic
     resume = Resume.model_validate({
@@ -722,7 +722,7 @@ def test_resume_calculate_experience_years_negative_days():
     assert years >= 0  # Should handle negative days gracefully
 
 
-def test_resume_calculate_experience_years_no_end_date():
+def test_resume_calculate_experience_years_no_end_date() -> None:
     """Test calculate_experience_years with no end_date (current date)."""
     from datetime import date
     
@@ -744,7 +744,7 @@ def test_resume_calculate_experience_years_no_end_date():
     assert years >= expected_min_years - 1  # Allow some tolerance
 
 
-def test_resume_edge_case_empty_skill_cleanup():
+def test_resume_edge_case_empty_skill_cleanup() -> None:
     """Test edge case for skills validation with empty and whitespace skills."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -756,7 +756,7 @@ def test_resume_edge_case_empty_skill_cleanup():
     assert resume.skills == ["Python", "JavaScript", "Java"]
 
 
-def test_resume_case_insensitive_skill_operations():
+def test_resume_case_insensitive_skill_operations() -> None:
     """Test case insensitive operations for skills."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -784,7 +784,7 @@ def test_resume_case_insensitive_skill_operations():
     assert "C++" in resume.skills
 
 
-def test_resume_experience_years_with_overlapping_dates():
+def test_resume_experience_years_with_overlapping_dates() -> None:
     """Test experience calculation with overlapping employment periods."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -809,7 +809,7 @@ def test_resume_experience_years_with_overlapping_dates():
     assert years >= 4.5  # Some tolerance for date calculations
 
 
-def test_resume_skill_match_score_partial_matching():
+def test_resume_skill_match_score_partial_matching() -> None:
     """Test skill matching with various partial match scenarios."""
     resume = Resume.model_validate({
         "name": "Test User",
@@ -831,7 +831,7 @@ def test_resume_skill_match_score_partial_matching():
     assert resume.skill_match_score(required_skills_4) == 0.0
 
 
-def test_resume_all_schema_models_instantiation():
+def test_resume_all_schema_models_instantiation() -> None:
     """Test instantiation of all schema models to ensure they work correctly."""
     from api.hr.models.resume import ExperienceEntry, EducationEntry
     
@@ -859,7 +859,7 @@ def test_resume_all_schema_models_instantiation():
     assert edu_entry.graduation_year == 2020
 
 
-def test_resume_repr_string_methods():
+def test_resume_repr_string_methods() -> None:
     """Test both __str__ and __repr__ methods thoroughly."""
     resume = Resume.model_validate({
         "name": "John Doe",
@@ -886,7 +886,7 @@ def test_resume_repr_string_methods():
     assert "experience=2" in repr_result  # Should show count of experience entries
 
 
-def test_resume_validator_return_paths():
+def test_resume_validator_return_paths() -> None:
     """Test validator return paths that might be missed."""
     from api.hr.models.resume import Resume
     

@@ -29,6 +29,8 @@ async def lifespan(
 
     # Create tables in the specified schema
     async with engine.begin() as conn:
+        # Create schema if it doesn't exist (especially important for test schema)
+        await conn.execute(text(f"CREATE SCHEMA IF NOT EXISTS {schema}"))
         await conn.execute(text(f"SET search_path TO {schema}"))
         await conn.run_sync(SQLModel.metadata.create_all)
 
@@ -49,4 +51,6 @@ async def lifespan(
         yield
     finally:
         print("Stopping lifespan...")
+        # Close the lifespan session before disposing the engine
+        await session.close()
         await engine.dispose()

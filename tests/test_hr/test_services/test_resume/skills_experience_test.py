@@ -1,9 +1,11 @@
 """
 Test skill and experience management for resume service.
 """
-
+from uuid import uuid4
 import pytest
 from datetime import date
+from sqlmodel.ext.asyncio.session import AsyncSession
+from tests.utils import get_unique_test_id
 
 from api.hr.services.resume import (
     create_resume, get_resume,
@@ -11,14 +13,16 @@ from api.hr.services.resume import (
     add_experience_to_resume, update_resume_experience,
     calculate_skill_match
 )
+from api.hr.models.resume import ResumeCreate
 
 
 # Skill Management Tests
 
 @pytest.mark.asyncio
-async def test_add_skill_to_resume_success(test_session, sample_resume_data):
+async def test_add_skill_to_resume_success(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test successful skill addition."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     initial_skills = resume.skills.copy()
 
     updated_resume = await add_skill_to_resume(test_session, resume.id, "Machine Learning")
@@ -32,9 +36,10 @@ async def test_add_skill_to_resume_success(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_add_skill_duplicate(test_session, sample_resume_data):
+async def test_add_skill_duplicate(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test adding duplicate skill (should not duplicate)."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     existing_skill = resume.skills[0]
     initial_count = len(resume.skills)
 
@@ -46,18 +51,23 @@ async def test_add_skill_duplicate(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_add_skill_case_insensitive(test_session, sample_resume_data):
+async def test_add_skill_case_insensitive(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test adding skill with different case (should not duplicate)."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     if "Python" in resume.skills:
         existing_skill = "Python"
     else:
         # Add a skill first
         await add_skill_to_resume(test_session, resume.id, "Python")
-        resume = await get_resume(test_session, resume.id)
+        retrieved_resume = await get_resume(test_session, resume.id)
+        assert retrieved_resume is not None, "Resume should be retrievable after creation"
+        assert retrieved_resume.id is not None, "Retrieved resume should have an ID"
+        resume = retrieved_resume
         existing_skill = "Python"
 
     initial_count = len(resume.skills)
+    assert resume.id is not None, "Resume should have an ID before skill operation"
 
     # Try to add same skill with different case
     updated_resume = await add_skill_to_resume(test_session, resume.id, "python")
@@ -67,34 +77,37 @@ async def test_add_skill_case_insensitive(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_add_skill_empty_string(test_session, sample_resume_data):
+async def test_add_skill_empty_string(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test adding empty skill raises ValueError."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     with pytest.raises(ValueError, match="Skill cannot be empty"):
         await add_skill_to_resume(test_session, resume.id, "")
 
 
 @pytest.mark.asyncio
-async def test_add_skill_whitespace_only(test_session, sample_resume_data):
+async def test_add_skill_whitespace_only(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test adding whitespace-only skill raises ValueError."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     with pytest.raises(ValueError, match="Skill cannot be empty"):
         await add_skill_to_resume(test_session, resume.id, "   ")
 
 
 @pytest.mark.asyncio
-async def test_add_skill_resume_not_found(test_session):
+async def test_add_skill_resume_not_found(test_session: AsyncSession) -> None:
     """Test adding skill to non-existent resume returns None."""
-    result = await add_skill_to_resume(test_session, 99999, "Python")
+    result = await add_skill_to_resume(test_session, get_unique_test_id(), "Python")
     assert result is None
 
 
 @pytest.mark.asyncio
-async def test_remove_skill_success(test_session, sample_resume_data):
+async def test_remove_skill_success(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test successful skill removal."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     skill_to_remove = resume.skills[0]
     initial_count = len(resume.skills)
 
@@ -106,9 +119,10 @@ async def test_remove_skill_success(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_remove_skill_not_present(test_session, sample_resume_data):
+async def test_remove_skill_not_present(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test removing non-existent skill (should not error)."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     initial_count = len(resume.skills)
 
     updated_resume = await remove_skill_from_resume(test_session, resume.id, "NonExistentSkill")
@@ -118,15 +132,20 @@ async def test_remove_skill_not_present(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_remove_skill_case_insensitive(test_session, sample_resume_data):
+async def test_remove_skill_case_insensitive(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test removing skill with different case."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     # Ensure we have a Python skill
     if "Python" not in resume.skills:
         await add_skill_to_resume(test_session, resume.id, "Python")
-        resume = await get_resume(test_session, resume.id)
+        retrieved_resume = await get_resume(test_session, resume.id)
+        assert retrieved_resume is not None, "Resume should be retrievable after skill addition"
+        assert retrieved_resume.id is not None, "Retrieved resume should have an ID"
+        resume = retrieved_resume
 
     initial_count = len(resume.skills)
+    assert resume.id is not None, "Resume should have an ID before skill operation"
 
     # Remove with different case
     updated_resume = await remove_skill_from_resume(test_session, resume.id, "python")
@@ -137,18 +156,19 @@ async def test_remove_skill_case_insensitive(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_remove_skill_resume_not_found(test_session):
+async def test_remove_skill_resume_not_found(test_session: AsyncSession) -> None:
     """Test removing skill from non-existent resume returns None."""
-    result = await remove_skill_from_resume(test_session, 99999, "Python")
+    result = await remove_skill_from_resume(test_session, get_unique_test_id(), "Python")
     assert result is None
 
 
 # Experience Management Tests
 
 @pytest.mark.asyncio
-async def test_add_experience_success(test_session, sample_resume_data):
+async def test_add_experience_success(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test successful experience addition."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     initial_count = len(resume.experience)
 
     new_experience = {
@@ -177,9 +197,10 @@ async def test_add_experience_success(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_add_experience_future_dates(test_session, sample_resume_data):
+async def test_add_experience_future_dates(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test adding experience with future dates raises ValueError."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     today = date.today()
     future_1 = today.replace(year=today.year + 1)
@@ -200,9 +221,10 @@ async def test_add_experience_future_dates(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_add_experience_end_before_start(test_session, sample_resume_data, test_uuid: str):
+async def test_add_experience_end_before_start(test_session: AsyncSession, sample_resume_data: ResumeCreate, test_uuid: str) -> None:
     """Test adding experience with end date before start date raises ValueError."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     start_date = date.today()
     invalid_end_date = date.today().replace(year=date.today().year - 1)
@@ -220,7 +242,7 @@ async def test_add_experience_end_before_start(test_session, sample_resume_data,
 
 
 @pytest.mark.asyncio
-async def test_add_experience_resume_not_found(test_session):
+async def test_add_experience_resume_not_found(test_session: AsyncSession) -> None:
     """Test adding experience to non-existent resume returns None."""
     experience = {
         "company": "Test Company",
@@ -228,14 +250,15 @@ async def test_add_experience_resume_not_found(test_session):
         "start_date": "2023-01-01"
     }
 
-    result = await add_experience_to_resume(test_session, 99999, experience)
+    result = await add_experience_to_resume(test_session, get_unique_test_id(), experience)
     assert result is None
 
 
 @pytest.mark.asyncio
-async def test_update_resume_experience_success(test_session, sample_resume_data):
+async def test_update_resume_experience_success(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test successful experience update."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     new_experiences = [
         {
@@ -261,9 +284,10 @@ async def test_update_resume_experience_success(test_session, sample_resume_data
 
 
 @pytest.mark.asyncio
-async def test_update_resume_experience_empty_list(test_session, sample_resume_data):
+async def test_update_resume_experience_empty_list(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test updating experience with empty list clears experience."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     updated_resume = await update_resume_experience(test_session, resume.id, [])
 
@@ -272,7 +296,7 @@ async def test_update_resume_experience_empty_list(test_session, sample_resume_d
 
 
 @pytest.mark.asyncio
-async def test_update_resume_experience_not_found(test_session):
+async def test_update_resume_experience_not_found(test_session: AsyncSession) -> None:
     """Test updating experience for non-existent resume returns None."""
     result = await update_resume_experience(test_session, 99999, [])
     assert result is None
@@ -281,9 +305,10 @@ async def test_update_resume_experience_not_found(test_session):
 # Skill Matching Tests
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_perfect_match(test_session, sample_resume_data):
+async def test_calculate_skill_match_perfect_match(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test skill matching with perfect match."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     required_skills = resume.skills.copy()  # Same skills as resume
 
     match_score = await calculate_skill_match(test_session, resume.id, required_skills)
@@ -292,9 +317,10 @@ async def test_calculate_skill_match_perfect_match(test_session, sample_resume_d
 
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_partial_match(test_session, sample_resume_data):
+async def test_calculate_skill_match_partial_match(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test skill matching with partial match."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     # Mix of matching and non-matching skills
     required_skills = resume.skills[:1] + ["NonExistentSkill1", "NonExistentSkill2"]
@@ -306,13 +332,16 @@ async def test_calculate_skill_match_partial_match(test_session, sample_resume_d
 
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_no_match(test_session, sample_resume_data):
+async def test_calculate_skill_match_no_match(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test skill matching with no matches."""
+    
     # Use a different email to avoid conflicts with other tests
     modified_data = sample_resume_data.model_copy()
-    modified_data.email = f"no-match-test-{modified_data.email}"
+    unique_id = str(uuid4())[:8]
+    modified_data.email = f"no-match-test-{unique_id}@example.com"
     
     resume = await create_resume(test_session, modified_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
     required_skills = ["NonExistentSkill1", "NonExistentSkill2"]
 
     match_score = await calculate_skill_match(test_session, resume.id, required_skills)
@@ -321,13 +350,17 @@ async def test_calculate_skill_match_no_match(test_session, sample_resume_data):
 
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_empty_required(test_session, sample_resume_data):
+async def test_calculate_skill_match_empty_required(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test skill matching with empty required skills."""
+    import uuid
+    
     # Use a different email to avoid conflicts with other tests
     modified_data = sample_resume_data.model_copy()
-    modified_data.email = f"empty-required-test-{modified_data.email}"
+    unique_id = str(uuid.uuid4())[:8]
+    modified_data.email = f"empty-required-test-{unique_id}@example.com"
     
     resume = await create_resume(test_session, modified_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     match_score = await calculate_skill_match(test_session, resume.id, [])
 
@@ -335,9 +368,10 @@ async def test_calculate_skill_match_empty_required(test_session, sample_resume_
 
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_case_insensitive(test_session, sample_resume_data):
+async def test_calculate_skill_match_case_insensitive(test_session: AsyncSession, sample_resume_data: ResumeCreate) -> None:
     """Test skill matching is case insensitive."""
     resume = await create_resume(test_session, sample_resume_data)
+    assert resume.id is not None, "Resume should have an ID after creation"
 
     # Ensure we have a Python skill
     if "Python" not in resume.skills:
@@ -352,7 +386,7 @@ async def test_calculate_skill_match_case_insensitive(test_session, sample_resum
 
 
 @pytest.mark.asyncio
-async def test_calculate_skill_match_resume_not_found(test_session):
+async def test_calculate_skill_match_resume_not_found(test_session: AsyncSession) -> None:
     """Test skill matching for non-existent resume returns 0."""
     match_score = await calculate_skill_match(test_session, 99999, ["Python"])
     assert match_score == 0.0
